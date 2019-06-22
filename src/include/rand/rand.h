@@ -1,7 +1,3 @@
-//
-// Created by Julian Palacci on 2019-06-08.
-//
-
 #ifndef MODLIB_RAND_H
 #define MODLIB_RAND_H
 

@@ -18,7 +18,7 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
     total_secret_cols = (int)(secret->header.width_px*width_factor);
 
     for (i = 0; i < n; ++i) {
-        shares[i] = NEW_MATRIX(total_secret_rows, total_secret_cols);
+        shares[i] = mod_matrix_new(total_secret_rows, total_secret_cols);
         shares[i]->rows = total_secret_rows;
         shares[i]->cols = total_secret_cols;
     }
@@ -26,20 +26,20 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
     // Create matrix for watermark remainder
     matrix_t * rw = mod_matrix_new(secret->header.height_px, secret->header.width_px);
 
-    matrix_t * S = NEW_MATRIX(n,n);
+    matrix_t * S = mod_matrix_new(n,n);
     S->cols = n;
     S->rows = n;
 
     matrix_t * W = mod_matrix_new(n, n);
 
-    matrix_t * A = NEW_MATRIX(n,k);
+    matrix_t * A = mod_matrix_new(n,k);
     A->cols = k;
     A->rows = n;
 
     matrix_t ** X = malloc(n * sizeof(matrix_t *));
 
     for(i = 0; i < n; i++) {
-        X[i] = NEW_MATRIX(k,1);
+        X[i] = mod_matrix_new(k,1);
         X[i]->rows = k;
         X[i]->cols = 1;
     }
@@ -51,7 +51,7 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
     matrix_t ** G = malloc(n * sizeof(matrix_t *));
 
     for(i = 0; i < n; i++) {
-        G[i] = NEW_MATRIX(n,2);
+        G[i] = mod_matrix_new(n,2);
         G[i]->rows = n;
         G[i]->cols = 2;
     }

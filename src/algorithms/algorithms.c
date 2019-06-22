@@ -5,61 +5,28 @@
 #include <stdio.h>
 #include <string.h>
 
-/**
- * Find the first non-zero element row
- * in a matrix column
- *
- * @param matrix
- * @param starting_row search will start from this row
- * @param column
- * @param ans here will be setted the result if there is one
- * @return different than 0 if found elem, 0 otherwise
- */
-static uint8_t
-algorithms_find_non_zero_in_column(const matrix_t* matrix,
-                                   uint32_t starting_row,
-                                   uint32_t column,
-                                   uint32_t* ans)
-{
-  for (uint32_t row = starting_row; row < matrix->rows; row++) {
-    if (ELEM(matrix, row, column) != 0) {
-      *ans = row;
+static inline uint8_t find_non_zero_col(const matrix_t *matrix,
+                  uint32_t start,
+                  uint32_t col,
+                  uint32_t *r){
+  for (uint32_t row = start; row < matrix->rows; row++) {
+    if (matrix->values[row][col] != 0) {
+      *r = row;
       return 1;
     }
   }
-
   return 0;
 }
 
-static void
-algorithms_swap_rows(matrix_t* matrix, uint32_t row1, uint32_t row2)
-{
-  uint32_t temp;
-
-  if (row1 == row2) {
-    return;
-  }
-
-  /** TODO: test performance against swaping entire rows at once using memcpy */
-
-  for (uint32_t col = 0; col < matrix->cols; col++) {
-    temp                    = ELEM(matrix, row1, col);
-    ELEM(matrix, row1, col) = ELEM(matrix, row2, col);
-    ELEM(matrix, row2, col) = temp;
-  }
+static inline void swap_rows(matrix_t *m, uint32_t row1, uint32_t row2){
+  uint32_t * temp;
+  temp = m->values[row1];
+  m->values[row1] = m->values[row2];
+  m->values[row2] = temp;
 }
 
-matrix_t*
-algorithms_gauss_row_reduction(const matrix_t* matrix)
-{
-  /** @link
-   * https://www.mathworks.com/matlabcentral/answers/441021-row-reduction-using-modular-arithmetic#answer_357676
-   */
-
-  matrix_t* m = NEW_MATRIX(matrix->rows, matrix->cols);
-  m->rows     = matrix->rows;
-  m->cols     = matrix->cols;
-  memcpy(m->values, matrix->values, m->rows * m->cols * sizeof(*m->values));
+matrix_t* algorithms_gauss_row_reduction(const matrix_t* matrix){
+  matrix_t* m = matrix_create_copy(matrix);
 
   uint32_t pivot_row   = 0;
   uint32_t pivot_col   = 0;
@@ -67,13 +34,12 @@ algorithms_gauss_row_reduction(const matrix_t* matrix)
 
   while (pivot_row < m->rows && pivot_col < m->cols) {
 
-    uint32_t temp_idx    = 0;
+    uint32_t temp    = 0;
 
     /** find the first non-zero remaining in column j */
-    if (algorithms_find_non_zero_in_column(
-          m, pivot_row, pivot_col, &temp_idx)) {
+    if (find_non_zero_col(m, pivot_row, pivot_col, &temp)) {
       /** an element was found */
-      pivot_value = ELEM(m, temp_idx, pivot_col);
+      pivot_value = m->values[temp][pivot_col];
     } else {
       pivot_value = 0;
     }
@@ -82,27 +48,26 @@ algorithms_gauss_row_reduction(const matrix_t* matrix)
 
       /** The column is negligible, zero it out. */
       for (uint32_t row = pivot_row; row < m->rows; row++) {
-        ELEM(m, row, pivot_col) = 0;
+        m->values[row][pivot_col] = 0;
       }
       pivot_col++;
 
     } else {
 
       /** Swap i-th and k-th rows. */
-      algorithms_swap_rows(m, pivot_row, temp_idx);
+        swap_rows(m, pivot_row, temp);
 
       /** Divide the pivot row by the pivot element. */
       for (uint32_t col = pivot_col; col < m->cols; col++) {
-        ELEM(m, pivot_row, col) = mod_div(ELEM(m, pivot_row, col), pivot_value);
+        m->values[pivot_row][col] = mod_div(m->values[pivot_row][col], pivot_value);
       }
 
       /** Subtract multiples of the pivot row from all the other rows. */
       for (uint32_t row = (pivot_row == 0 ? 1 : 0); row < m->rows;
            row += (row == pivot_row - 1 ? 2 : 1)) {
-        uint32_t pivot_temp = ELEM(m, row, pivot_col);
+        uint32_t pivot_temp = m->values[row][pivot_col];
         for (uint32_t col = pivot_col; col < m->cols; col++) {
-          ELEM(m, row, col) = mod_sub(
-            ELEM(m, row, col), mod_mul(pivot_temp, ELEM(m, pivot_row, col)));
+          m->values[row][col] = mod_sub(m->values[row][col], mod_mul(pivot_temp, m->values[pivot_row][col]));
         }
       }
 
@@ -114,24 +79,42 @@ algorithms_gauss_row_reduction(const matrix_t* matrix)
   return m;
 }
 
+uint32_t rank(matrix_t * m) {
+    matrix_t * gm = algorithms_gauss_row_reduction(mod_matrix_transpose(m));
+    uint32_t r = 0,c = 0;
+
+    for (uint32_t row = 0; row < gm->rows; row++) {
+        for(uint32_t col = 0; col < gm->cols; col++) {
+            if (gm->values[row][col] == 0) {
+                c++;
+            }
+        }
+        if(c == gm->cols) {
+            r++;
+        }
+        c = 0;
+    }
+    uint32_t ans = m->cols - r;
+    mod_matrix_free(gm);
+    return ans;
+}
+
 matrix_t * inverse(matrix_t * m) {
     matrix_t * extended = merge(m, ones(m->rows, m->cols));
     matrix_t * gauss = algorithms_gauss_row_reduction(extended);
-    //Reducir
-    matrix_t * inverse = NEW_MATRIX(m->rows, gauss->cols / 2);
-    inverse->rows = m->rows;
-    inverse->cols = gauss->cols / 2;
-    uint32_t * aux_m = inverse->values;
-    for(int i = 1; (i * m->cols) < gauss->rows * gauss->cols; i++) {
 
-            if(i % 2 == 1) {
-                memcpy(aux_m, gauss->values + m->cols * i, m->cols * sizeof(*m->values));
-                aux_m += m->cols;
-            }
-
-
-
+    matrix_t * inverse = mod_matrix_new(m->rows, gauss->cols / 2);
+    uint32_t * * values_i = inverse->values;
+    uint32_t * * values_g = gauss->values;
+    //TODO CHECK THIS
+    for(uint32_t i = 0; i < inverse->rows; i++) {
+        for(uint32_t j = 0; j < inverse->cols; j ++){
+             values_i[i][j] = values_g[i][j+m->cols];
+        }
     }
+
+    mod_matrix_free(gauss);
+    mod_matrix_free(extended);
     return inverse;
 }
 
@@ -141,30 +124,13 @@ matrix_t * projection(matrix_t * m) {
     matrix_t * b = inverse(a);
     matrix_t * c = mod_matrix_mul(m, b);
     matrix_t * d = mod_matrix_mul(c, transposed);
+
+    //Freeing up mem
+    mod_matrix_free(transposed);
+    mod_matrix_free(a);
+    mod_matrix_free(b);
+    mod_matrix_free(c);
     return d;
-
-
-
 }
 
-int rank(matrix_t * m) {
-    matrix_t * gauss = algorithms_gauss_row_reduction(mod_matrix_transpose(m));
-    int zero_rows = 0;
-    int count = 0;
-    for (int row = 0; row < gauss->rows; row++) {
 
-        count = 0;
-        for(int col = 0; col < gauss->cols; col++) {
-            if (ELEM(gauss, row, col) == 0) {
-                count++;
-            } else {
-                count = 0;
-            }
-        }
-        if(count == gauss->cols) {
-            zero_rows++;
-        }
-
-    }
-    return m->cols - zero_rows;
-}

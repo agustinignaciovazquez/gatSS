@@ -9,78 +9,28 @@ typedef struct
 {
   uint32_t rows;
   uint32_t cols;
-  uint32_t values[];
+  uint32_t * * values;
 } matrix_t;
 
-/**
- * @brief Perform m1+m2
- *
- * @param m1
- * @param m2
- * @return matrix_t* a new matrix with the result of the operation
- */
-matrix_t*
-mod_matrix_sum(matrix_t* m1, matrix_t* m2);
+matrix_t* mod_matrix_new(uint32_t rows, uint32_t cols);
 
-/**
- * @brief Perform m1-m2
- *
- * @param m1
- * @param m2
- * @return matrix_t* a new matrix with the result of the operation
- */
-matrix_t*
-mod_matrix_sub(matrix_t* m1, matrix_t* m2);
+void mod_matrix_free(matrix_t* m);
 
-/**
- * @brief Perform m1*m2
- *
- * @param m1
- * @param m2
- * @return matrix_t* a new matrix with the result of the operation
- */
-matrix_t*
-mod_matrix_mul(matrix_t* m1, matrix_t* m2);
+matrix_t* mod_matrix_sum(matrix_t* a, matrix_t* m2);
 
-/**
- * @brief Perform e*m
- *
- * @param e
- * @param m
- * @return matrix_t* a new matrix with the result of the operation
- */
-matrix_t*
-mod_matrix_mul_esc(uint32_t e, matrix_t* m);
+matrix_t* mod_matrix_sub(matrix_t* m1, matrix_t* m2);
 
-/**
- * @brief Transpose m
- *
- * @param m
- * @return matrix_t* a new matrix with m transposed
- */
-matrix_t*
-mod_matrix_transpose(matrix_t* m);
+matrix_t* mod_matrix_mul(matrix_t* a, matrix_t* m2);
 
-/**
- * @brief Creates a new matrix
- *
- * @param rows
- * @param cols
- * @return matrix_t* a new matrix
- */
-matrix_t*
-mod_matrix_new(uint32_t rows, uint32_t cols);
+matrix_t* mod_matrix_transpose(matrix_t* m);
 
-/**
- * @brief Creates a random matrix
- *
- * @param rows
- * @param cols
- * @param range
- * @return matrix_t* a new matrix with all its values random
- */
-matrix_t*
-create_random_int_matrix(uint32_t rows, uint32_t cols, uint32_t range);
+matrix_t * matrix_create_copy(matrix_t * m);
+
+void matrix_copy(matrix_t * from, matrix_t * to);
+
+matrix_t * merge(matrix_t * a, matrix_t * b);
+
+matrix_t * ones(uint32_t rows, uint32_t cols);
 
 void print_matrix(matrix_t * matrix);
 

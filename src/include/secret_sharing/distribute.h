@@ -1,7 +1,3 @@
-//
-// Created by agustin on 10/06/19.
-//
-
 #ifndef DISTRIBUTE_H
 #define DISTRIBUTE_H
 

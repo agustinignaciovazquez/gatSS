@@ -1,7 +1,3 @@
-//
-// Created by Julian Palacci on 2019-06-08.
-//
-
 #include <rand/rand.h>
 #include <stdio.h>
 #include <limits.h>

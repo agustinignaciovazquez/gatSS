@@ -1,7 +1,3 @@
-//
-// Created by Julian Palacci on 2019-06-12.
-//
-
 #include <args/args.h>
 #include <unistd.h>
 #include <getopt.h>

@@ -161,3 +161,10 @@ cmake-build-debug/src/steg/CMakeFiles/steg.dir/steg.c.o
 cmake-build-debug/src/steg/libsteg.a
 cmake-build-debug/src/steg/Makefile
 cmake-build-debug/ss.cbp
+.idea/gatSS.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
+cmake-build-debug/target/gatSS
+cmake-build-debug/target/ss
+cmake-build-debug/target/test/mod_test
