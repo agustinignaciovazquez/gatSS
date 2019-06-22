@@ -57,7 +57,7 @@ void generate_G_matrix(matrix_t **G, matrix_t *R, int n, int k) {
                     sum += (value * pow);
 
                 }
-                G[t]->values[i][z] = sum % 251;
+                G[t]->values[i][z] = sum % MOD;
                 z++;
             }
             z = 0;
@@ -83,7 +83,7 @@ void create_random_x_vectors(matrix_t **X, int n, int k) {
     } while (contains(a_array, j, a));
     a_array[j] = a;
     for (int row = 0; row < k; row++) {
-        a_pow = (uint8_t) (int_pow(a, row) % 251);
+        a_pow = (uint8_t) (int_pow(a, row) % MOD);
         X[j]->values[row][0] = a_pow;
     }
   }

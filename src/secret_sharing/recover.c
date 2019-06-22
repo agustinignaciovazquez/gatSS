@@ -42,7 +42,7 @@ void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage
 
     for (row = 0; row < I->rows; row++) {
         for(col = 0; col < I->cols; col++) {
-            I->values[row][col] = (int_pow(shadows[row]->header.reserved1, col)) % 251;
+            I->values[row][col] = (int_pow(shadows[row]->header.reserved1, col)) % MOD;
         }
     }
     I = inverse(I);
