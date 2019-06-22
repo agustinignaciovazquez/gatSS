@@ -2,6 +2,7 @@
 #include <secret_sharing/recover.h>
 #include <secret_sharing/utils.h>
 #include <args/args.h>
+#include <algorithms/algorithms.h>
 #include <time.h>
 #include <bmp/bmp.h>
 #include <mod/mod.h>
@@ -163,16 +164,8 @@ int recovery_mode(cmd_options options){
 
 int main(int argc, char* argv[]) {
 
-   // Configurations
-
     set_seed(1);
-    for(int i=0;i < 1000;i++){
-        for(int j =0; j<1000;j++){
-            if(mod_mul(i,j) != mod_sub2(i,j)){
-                printf("%d : %d \n",mod_mul(i,j),mod_sub2(i,j));
-            }
-        }
-    }
+
     cmd_options options;
     cmd_status status = parse_args(argc, argv, &options);
 

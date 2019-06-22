@@ -20,59 +20,45 @@ void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage
     matrix_t ** shares = malloc(sizeof(*shares)* k);
     for (i = 0; i < k; i++) {
         shares[i] = mod_matrix_new(total_secret_rows, total_secret_cols);
-        shares[i]->cols = total_secret_cols;
-        shares[i]->rows = total_secret_rows;
     }
 
     matrix_t ** Sh = malloc(sizeof(*Sh) * k);
     for (i = 0; i < k; i++) {
         Sh[i] = mod_matrix_new(n,3);
-        Sh[i]->cols = 3;
-        Sh[i]->rows = n;
     }
 
     matrix_t ** G = malloc(sizeof(*G) * k);
     for (i = 0; i < k; i++) {
         G[i] = mod_matrix_new(n,2);
-        G[i]->cols = 2;
-        G[i]->rows = n;
     }
 
     matrix_t * B = mod_matrix_new(n, k);
-    B->rows = n;
-    B->cols = k;
 
     matrix_t* R = mod_matrix_new(n, n);
-    R->cols = n;
-    R->rows = n;
 
     matrix_t * I = mod_matrix_new(k, k);
-    I->cols = k;
-    I->rows = k;
 
     matrix_t * Rw = mod_matrix_new(n, n);
 
     for (row = 0; row < I->rows; row++) {
         for(col = 0; col < I->cols; col++) {
-            I->values[row * I->cols + col] = (int_pow(shadows[row]->header.reserved1, col)) % 251;
+            I->values[row][col] = (int_pow(shadows[row]->header.reserved1, col)) % 251;
         }
     }
     I = inverse(I);
-
     matrix_t * Ii;
     matrix_t * S;
     matrix_t * W;
 
     matrix_t * Gg = mod_matrix_new(k,1);
-    Gg->rows = k;
-    Gg->cols = 1;
 
     for (j = 0; j < k; j++) {
         for (i = 0; i < shadows[j]->header.image_size_bytes; i += n) {
-            shares[j]->values[i/n] = recover_lsb(shadows[j]->data + i, n);
+            int col = (i/n) % shares[j]->cols;
+            int row = (i/n) / shares[j]->cols;
+            shares[j]->values[row][col] = recover_lsb(shadows[j]->data + i, n);
         }
     }
-
 
     // The shares are of equal size
     for (int share_image_row = 0, secret_row = 0; share_image_row < shares[0]->rows; share_image_row += n, secret_row += n) {

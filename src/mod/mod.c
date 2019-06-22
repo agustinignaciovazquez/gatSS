@@ -5,23 +5,9 @@
 uint32_t
 mod_sum(uint32_t a, uint32_t b)
 {
-    return modulo(a + b);
-}
+    if(modulo(a+b) > MOD){printf("FOUND %d", modulo(a+b));}
 
-uint32_t
-mod_sub2(uint32_t a, uint32_t b)
-{
-    long double x;
-    uint32_t c;
-    int32_t r;
-    if (a >= MOD)
-        a %= MOD;
-    if (b >= MOD)
-        b %= MOD;
-    x = a;
-    c = x * b / MOD;
-    r = (int32_t)(a * b - c * MOD) % (int32_t)MOD;
-    return r < 0 ? r + MOD : r;
+    return modulo(a + b);
 }
 
 uint32_t

@@ -112,7 +112,6 @@ matrix_t * inverse(matrix_t * m) {
              values_i[i][j] = values_g[i][j+m->cols];
         }
     }
-
     mod_matrix_free(gauss);
     mod_matrix_free(extended);
     return inverse;
@@ -120,16 +119,12 @@ matrix_t * inverse(matrix_t * m) {
 
 matrix_t * projection(matrix_t * m) {
     matrix_t * transposed = mod_matrix_transpose(m);
+
     matrix_t * a = mod_matrix_mul(transposed,m);
+    print_matrix(a);
     matrix_t * b = inverse(a);
     matrix_t * c = mod_matrix_mul(m, b);
     matrix_t * d = mod_matrix_mul(c, transposed);
-
-    //Freeing up mem
-    mod_matrix_free(transposed);
-    mod_matrix_free(a);
-    mod_matrix_free(b);
-    mod_matrix_free(c);
     return d;
 }
 

@@ -44,7 +44,7 @@ matrix_t*
 mod_matrix_mul(matrix_t* a, matrix_t* b)
 {
     if (a->cols != b->rows) {
-        printf("Incorrent multiply matrix dimensions!");
+        printf("Incorrect multiply matrix dimensions!");
         exit(EXIT_FAILURE);
     }
 
@@ -66,15 +66,13 @@ mod_matrix_mul(matrix_t* a, matrix_t* b)
     return r;
 }
 
-matrix_t*
-mod_matrix_transpose(matrix_t* m)
-{
-  matrix_t* r = mod_matrix_new(m->rows, m->cols);
+matrix_t* mod_matrix_transpose(matrix_t* m){
+  matrix_t* r = mod_matrix_new(m->cols, m->rows);
   uint32_t * * values_r = r->values;
   uint32_t * * values_m = m->values;
 
-  for (uint32_t i = 0; i < m->rows; i++) {
-    for (uint32_t j = 0; j < m->cols; j++) {
+  for (uint32_t i = 0; i < r->rows; i++) {
+    for (uint32_t j = 0; j < r->cols; j++) {
         values_r[i][j] = values_m[j][i];
     }
   }
@@ -125,7 +123,7 @@ matrix_t * merge(matrix_t * a, matrix_t * b) {
         exit(EXIT_FAILURE);
     }
 
-    matrix_t * r = mod_matrix_new(a->rows, a->cols + a->cols);
+    matrix_t * r = mod_matrix_new(a->rows, a->cols + b->cols);
     uint32_t * * values_r = r->values;
     uint32_t * * values_a = a->values;
     uint32_t * * values_b = b->values;
@@ -134,7 +132,7 @@ matrix_t * merge(matrix_t * a, matrix_t * b) {
             values_r[i][j] = values_a[i][j];
         }
         for(uint32_t j = 0; j < b->cols; j ++){
-            values_r[i][a->rows + j] = values_b[i][j];
+            values_r[i][a->cols + j] = values_b[i][j];
         }
     }
 
@@ -146,6 +144,7 @@ void print_matrix(matrix_t * matrix) {
         for(uint32_t j = 0; j < matrix->cols; j++) {
             printf("%d ", matrix->values[i][j]);
         }
+        printf("\n");
     }
 }
 

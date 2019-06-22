@@ -27,21 +27,15 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
     matrix_t * rw = mod_matrix_new(secret->header.height_px, secret->header.width_px);
 
     matrix_t * S = mod_matrix_new(n,n);
-    S->cols = n;
-    S->rows = n;
 
     matrix_t * W = mod_matrix_new(n, n);
 
     matrix_t * A = mod_matrix_new(n,k);
-    A->cols = k;
-    A->rows = n;
 
     matrix_t ** X = malloc(n * sizeof(matrix_t *));
 
     for(i = 0; i < n; i++) {
         X[i] = mod_matrix_new(k,1);
-        X[i]->rows = k;
-        X[i]->cols = 1;
     }
 
     matrix_t ** V = malloc(n * sizeof(matrix_t *));
@@ -52,8 +46,6 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
 
     for(i = 0; i < n; i++) {
         G[i] = mod_matrix_new(n,2);
-        G[i]->rows = n;
-        G[i]->cols = 2;
     }
 
 
@@ -61,7 +53,7 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
         for (secret_col = 0, share_col = 0; secret_col < secret->header.width_px; secret_col += n, share_col += 3) {
 
             create_random_A_matrix(A);
-            print_matrix(A);
+
             matrix_t * Sd = projection(A);
 
             get_sub_matrix_from_image(S, secret, secret_col, secret_row);

@@ -14,18 +14,21 @@ void hide_shares(matrix_t **shares, BMPImage **shadows, int n) {
 
     FILE * fd;
     BMPImage * shadow;
-    int i, j;
+    uint32_t k, i, j;
     char file_name[11] = "shareN.bmp";
-    for (i = 0; i < n; ++i) {
-        shadow = shadows[i];
-        for (j = 0; j < shares[0]->rows*shares[i]->cols; j++) {
-            // Steganography
-            distribute_lsb(shares[i]->values[j], shadow->data + j*n, n);
+    for (k = 0; k < n; k++) {
+        shadow = shadows[k];
+        for (i = 0; i < shares[k]->rows; i++) {
+            for(j = 0; j < shares[k]-> cols; j++) {
+                // Steganography
+                distribute_lsb(shares[k]->values[i][j], shadow->data + j * n, n);
+            }
         }
+
         // This is for the I matrix in the recover algorithm
-        shadow->header.reserved1 = i + 1;
+        shadow->header.reserved1 = k + 1;
         // Change the N for the number of the share
-        file_name[5] = i +'0' + 1;
+        file_name[5] = k +'0' + 1;
         fd = fopen(file_name, "wb");
         write_bmp(shadow, fd);
 
@@ -49,12 +52,12 @@ void generate_G_matrix(matrix_t **G, matrix_t *R, int n, int k) {
             for (int j = 0; j < R->cols; j += k) {
                 sum = 0;
                 for (int l = 0; l < k; ++l) {
-                    uint32_t value = R->values[i * R->cols + j + l];
+                    uint32_t value = R->values[i][j + l];
                     int pow = int_pow((t + 1), l);
                     sum += (value * pow);
 
                 }
-                G[t]->values[i * G[t]->cols + z] = sum % 251;
+                G[t]->values[i][z] = sum % 251;
                 z++;
             }
             z = 0;
@@ -112,7 +115,7 @@ void get_sub_matrix_from_image(matrix_t *s, BMPImage *secret, int base_col, int 
 void get_sub_matrix_from_matrix(matrix_t *s, matrix_t *secret, int base_col, int base_row) {
     for(int row=0; row < s->rows; row++ ){
         for (int col = 0; col < s->cols; col++) {
-            s->values[row][col] = (uint32_t) secret->values[((base_row+row)*secret->cols) + base_col + col];
+            s->values[row][col] = (uint32_t) secret->values[base_row+row][base_col + col];
         }
     }
 }
