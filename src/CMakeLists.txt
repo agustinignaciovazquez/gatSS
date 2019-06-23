@@ -1,7 +1,4 @@
-# Subdirectories
-add_subdirectory(secret_sharing)
-add_subdirectory(parser)
-
+# Include dirs
 include_directories(secret_sharing/include/)
 include_directories(secret_sharing/bmp/include/)
 include_directories(secret_sharing/utils/include/)

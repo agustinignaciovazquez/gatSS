@@ -1,5 +1,0 @@
-include_directories(include/)
-include_directories(bmp/include/)
-include_directories(utils/include/)
-include_directories(mod_256/include/)
-include_directories(stegano/include/)
