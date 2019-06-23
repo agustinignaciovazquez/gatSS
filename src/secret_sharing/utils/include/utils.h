@@ -13,9 +13,9 @@ void rand_set_seed(int64_t s);
 
 uint32_t int_pow(uint32_t x, uint32_t y);
 
-void get_sub_matrix_from_image(matrix *sm, BMPImage * s, uint32_t base);
+void sm_from_bmp(matrix *sm, BMPImage * s, uint32_t base);
 
-void get_sub_matrix_into_matrix(matrix * m, matrix * sm, uint32_t base);
+void sm_merge_matrix(matrix * m, matrix * sm, uint32_t base);
 
 uint32_t check_shadow_sizes(BMPImage * secret,  BMPImage ** shadows, size_t len, uint32_t n, uint32_t k);
 

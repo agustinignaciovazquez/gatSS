@@ -21,7 +21,7 @@ uint8_t rand_next_char(void) {
     return r;
 }
 
-void get_sub_matrix_into_matrix(matrix *m, matrix *sm, uint32_t base) {
+void sm_merge_matrix(matrix *m, matrix *sm, uint32_t base) {
     for (uint32_t k = 0; k < sm->rows * sm->cols; k++) {
         uint32_t j = (base + k) % m->cols;
         uint32_t i = (base + k) / m->cols;
@@ -29,7 +29,7 @@ void get_sub_matrix_into_matrix(matrix *m, matrix *sm, uint32_t base) {
     }
 }
 
-void get_sub_matrix_from_image(matrix * sm, BMPImage * s, uint32_t base) {
+void sm_from_bmp(matrix * sm, BMPImage * s, uint32_t base) {
     uint32_t t;
     for (uint32_t k = 0; k < sm->rows * sm->cols; k++) {
         uint32_t j = (k) % sm->cols;

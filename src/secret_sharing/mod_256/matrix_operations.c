@@ -74,7 +74,7 @@ uint32_t rank(matrix * m) {
     return ans;
 }
 
-matrix * inverse(matrix * m) {
+matrix * matrix_inverse(matrix * m) {
     matrix * extended = matrix_merge(m, matrix_identity(m->rows, m->cols));
     matrix * gauss = matrix_gauss_algorithm(extended);
 
@@ -98,7 +98,7 @@ matrix * inverse(matrix * m) {
 matrix * matrix_projection(matrix * m) {
     matrix * transposed = matrix_transpose(m);
     matrix * a = matrix_multiply(transposed,m);
-    matrix * b = inverse(a);
+    matrix * b = matrix_inverse(a);
     matrix * c = matrix_multiply(m, b);
     matrix * d = matrix_multiply(c, transposed);
 

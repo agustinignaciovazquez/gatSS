@@ -44,7 +44,7 @@ void distribute(BMPImage *secret, BMPImage ** shadows, BMPImage * wm,uint32_t k,
         //matrix_print(A);
         matrix *Sd = matrix_projection(A);
         //matrix_print(Sd);
-        get_sub_matrix_from_image(S, secret, secret_k);
+        sm_from_bmp(S, secret, secret_k);
         //matrix_print(S);
         matrix *R = matrix_subtract(S, Sd);
         //matrix_print(R);
@@ -56,9 +56,9 @@ void distribute(BMPImage *secret, BMPImage ** shadows, BMPImage * wm,uint32_t k,
         }
 
         // Generate Rw matrix
-        get_sub_matrix_from_image(W, wm, secret_k);
+        sm_from_bmp(W, wm, secret_k);
         matrix *current_rw = matrix_subtract(W, Sd);
-        get_sub_matrix_into_matrix(rw, current_rw, secret_k);
+        sm_merge_matrix(rw, current_rw, secret_k);
         //matrix_print(rw);
 
         fill_G_into_matrix(G, R, n, k);
@@ -68,7 +68,7 @@ void distribute(BMPImage *secret, BMPImage ** shadows, BMPImage * wm,uint32_t k,
         }
 
         for (uint32_t i = 0; i < n; i++) {
-            get_sub_matrix_into_matrix(shares[i], Sh[i], share_k);
+            sm_merge_matrix(shares[i], Sh[i], share_k);
         }
 
         matrix_free(R);

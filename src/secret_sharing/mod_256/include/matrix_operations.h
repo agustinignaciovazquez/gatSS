@@ -6,7 +6,7 @@
 #define GATSS_MATRIX_OPERATIONS_H
 #include "matrix_arithmetic.h"
 
-matrix * inverse(matrix * m);
+matrix * matrix_inverse(matrix * m);
 
 matrix * matrix_projection(matrix * m);
 

@@ -5,8 +5,8 @@
 #include "utils.h"
 #include <stdlib.h>
 
-static inline void get_sub_matrix_into_image(matrix * sm, BMPImage * s, uint32_t base);
-static inline void get_sub_matrix_from_matrix(matrix *s, matrix *secret, uint32_t base);
+static inline void sm_merge_bmp(matrix * sm, BMPImage * s, uint32_t base);
+static inline void sm_from_matrix(matrix *s, matrix *secret, uint32_t base);
 
 void recover(char * filename, BMPImage **shadows, BMPImage *rw,uint32_t k, uint32_t n) {
     double width_factor = (1.0 / k + 1.0 / n);
@@ -23,7 +23,7 @@ void recover(char * filename, BMPImage **shadows, BMPImage *rw,uint32_t k, uint3
             I->values[row][col] = (int_pow(shadows[row]->header.reserved1 + 1, col)) % MOD;
         }
     }
-    I = inverse(I);
+    I = matrix_inverse(I);
 
     matrix **G = malloc(sizeof(*G) * k);
     for (uint32_t i = 0; i < k; i++) {
@@ -51,7 +51,7 @@ void recover(char * filename, BMPImage **shadows, BMPImage *rw,uint32_t k, uint3
     for (uint32_t share_image_k = 0, secret_k = 0;share_image_k < (shares[0]->rows * shares[0]->cols);) {
 
         for (uint32_t i = 0; i < k; i++) {
-            get_sub_matrix_from_matrix(Sh[i], shares[i], share_image_k);
+            sm_from_matrix(Sh[i], shares[i], share_image_k);
         }
 
         for (uint32_t i = 0; i < k; i++) {
@@ -86,11 +86,11 @@ void recover(char * filename, BMPImage **shadows, BMPImage *rw,uint32_t k, uint3
         }
 
         matrix *S = matrix_sum(Sd, R);
-        get_sub_matrix_into_image(S, secret, secret_k);
+        sm_merge_bmp(S, secret, secret_k);
 
-        get_sub_matrix_from_image(Rw, rw, secret_k);
+        sm_from_bmp(Rw, rw, secret_k);
         matrix *W = matrix_sum(Sd, Rw);
-        get_sub_matrix_into_image(W, watermark, secret_k);
+        sm_merge_bmp(W, watermark, secret_k);
 
         share_image_k += (n * 3);
         secret_k += (n * n);
@@ -126,7 +126,7 @@ void recover(char * filename, BMPImage **shadows, BMPImage *rw,uint32_t k, uint3
     free(shares);
 }
 
-static inline void get_sub_matrix_into_image(matrix * sm, BMPImage * s, uint32_t base){
+static inline void sm_merge_bmp(matrix * sm, BMPImage * s, uint32_t base){
     for (uint32_t k = 0; k < sm->rows * sm->cols; k++) {
         uint32_t j = (k) % sm->cols;
         uint32_t i = (k) / sm->cols;
@@ -134,7 +134,7 @@ static inline void get_sub_matrix_into_image(matrix * sm, BMPImage * s, uint32_t
     }
 }
 
-static inline void get_sub_matrix_from_matrix(matrix *s, matrix *secret, uint32_t base) {
+static inline void sm_from_matrix(matrix *s, matrix *secret, uint32_t base) {
     for (uint32_t k = 0; k < s->rows * s->cols; k++) {
         uint32_t j = (base + k) % secret->cols;
         uint32_t i = (base + k) / secret->cols;
