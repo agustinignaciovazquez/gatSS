@@ -3,81 +3,72 @@
 #include "utils.h"
 #include "stegano.h"
 #include <stdlib.h>
+
+#define ASCII_DIG(i) (i + '0')
+
 static inline void rand_A_verified_into_matrix(matrix *A);
 static inline void fill_G_into_matrix(matrix **G, matrix *R, uint32_t n, uint32_t k);
 static inline void rw_into_bmp(BMPImage *s, matrix *rw);
 static inline void fill_rand_X_into(matrix **X, uint32_t n, uint32_t k);
 static inline void stegano_into_image(matrix **shares, BMPImage **shadows, uint32_t n);
 
-void distribute(uint32_t k, uint32_t n, BMPImage *secret, BMPImage **shadows, BMPImage *watermark) {
-
-    uint32_t secret_position, share_position = 0, i, total_secret_rows, total_secret_cols;
-
-    matrix **shares;
-    shares = malloc(sizeof(*shares) * n);
-    total_secret_rows = secret->header.height_px;
+void distribute(BMPImage *secret, BMPImage ** shadows, BMPImage * wm,uint32_t k, uint32_t n) {
     double width_factor = (1.0 / k + 1.0 / n);
-    total_secret_cols = (int) (secret->header.width_px * width_factor);
-
-    for (i = 0; i < n; ++i) {
-        shares[i] = matrix_create_new(total_secret_rows, total_secret_cols);
-    }
+    uint32_t secret_rows = secret->header.height_px, secret_cols = (uint32_t) (secret->header.width_px * width_factor);
 
     matrix *rw = matrix_create_new(secret->header.height_px, secret->header.width_px);
-
+    matrix *A = matrix_create_new(n, k);
+    matrix *W = matrix_create_new(n, n);
     matrix *S = matrix_create_new(n, n);
 
-    matrix *W = matrix_create_new(n, n);
-
-    matrix *A = matrix_create_new(n, k);
+    matrix **V = malloc(n * sizeof(matrix *));
+    matrix **Sh = malloc(n * sizeof(matrix *));
 
     matrix **X = malloc(n * sizeof(matrix *));
-
-    for (i = 0; i < n; i++) {
+    for (uint32_t i = 0; i < n; i++) {
         X[i] = matrix_create_new(k, 1);
     }
 
-    matrix **V = malloc(n * sizeof(matrix *));
-
-    matrix **Sh = malloc(n * sizeof(matrix *));
-
     matrix **G = malloc(n * sizeof(matrix *));
-
-    for (i = 0; i < n; i++) {
+    for (uint32_t i = 0; i < n; i++) {
         G[i] = matrix_create_new(n, 2);
     }
 
-    for (secret_position = 0, share_position = 0;secret_position < secret->header.image_size_bytes; secret_position += n * n, share_position += n * 3) {
+    matrix **shares = malloc(sizeof(*shares) * n);
+    for (uint32_t i = 0; i < n; ++i) {
+        shares[i] = matrix_create_new(secret_rows, secret_cols);
+    }
 
+    for (uint32_t secret_k = 0, share_k = 0;secret_k < secret->header.image_size_bytes; secret_k += n * n, share_k += n * 3) {
         rand_A_verified_into_matrix(A);
         //matrix_print(A);
         matrix *Sd = matrix_projection(A);
         //matrix_print(Sd);
-        get_sub_matrix_from_image(S, secret, secret_position);
+        get_sub_matrix_from_image(S, secret, secret_k);
         //matrix_print(S);
         matrix *R = matrix_subtract(S, Sd);
         //matrix_print(R);
         fill_rand_X_into(X, n, k);
 
         // Generate V vectors
-        for (int z = 0; z < n; z++) {
-            V[z] = matrix_multiply(A, X[z]);
+        for (uint32_t i = 0; i < n; i++) {
+            V[i] = matrix_multiply(A, X[i]);
         }
 
         // Generate Rw matrix
-        get_sub_matrix_from_image(W, watermark, secret_position);
+        get_sub_matrix_from_image(W, wm, secret_k);
         matrix *current_rw = matrix_subtract(W, Sd);
-        get_sub_matrix_into_matrix(rw, current_rw, secret_position);
+        get_sub_matrix_into_matrix(rw, current_rw, secret_k);
         //matrix_print(rw);
 
         fill_G_into_matrix(G, R, n, k);
 
-        for (i = 0; i < n; i++) {
+        for (uint32_t i = 0; i < n; i++) {
             Sh[i] = matrix_merge(V[i], G[i]);
         }
 
-        for (int l = 0; l < n; l++) {
-            get_sub_matrix_into_matrix(shares[l], Sh[l], share_position);
+        for (uint32_t i = 0; i < n; i++) {
+            get_sub_matrix_into_matrix(shares[i], Sh[i], share_k);
         }
 
         matrix_free(R);
@@ -88,7 +79,7 @@ void distribute(uint32_t k, uint32_t n, BMPImage *secret, BMPImage **shadows, BM
             matrix_free(V[i]);
         }
     }
-
+    //Save shares hidden into images
     stegano_into_image(shares, shadows, n);
     rw_into_bmp(secret, rw);
 
@@ -108,29 +99,20 @@ void distribute(uint32_t k, uint32_t n, BMPImage *secret, BMPImage **shadows, BM
     free(Sh);
     free(V);
     free(shares);
-
 }
 
 static inline void stegano_into_image(matrix **shares, BMPImage **shadows, uint32_t n) {
-    FILE *fd;
-    BMPImage *shadow;
-    int i, j;
-    char file_name[11] = "shareN.bmp";
-    for (i = 0; i < n; ++i) {
-        shadow = shadows[i];
-        for (j = 0; j < shares[0]->rows * shares[i]->cols; j++) {
-            // Steganography
-            distribute_lsb(shares[i]->values[j/shares[i]->cols][j%shares[i]->cols], shadow->data + j * n, n);
+    char filename[20] = "shares_N.bmp";
+    for (uint32_t k = 0; k < n; ++k) {
+        BMPImage *shadow = shadows[k];
+        for (uint32_t p = 0; p < shares[0]->rows * shares[k]->cols; p++) {
+            distribute_lsb(shares[k]->values[p/shares[k]->cols][p%shares[k]->cols], shadow->data + p * n, n);
         }
-        // This is for the I matrix in the recover algorithm
-        shadow->header.reserved1 = i;
-        // Change the N for the number of the share
-        file_name[5] = i + '0' + 1;
-        fd = fopen(file_name, "wb");
+        filename[7] = ASCII_DIG(k+1);
+        shadow->header.reserved1 = k;
+        FILE *fd = fopen(filename, "wb");
         write_bmp(shadow, fd);
-
     }
-
 }
 
 
@@ -145,7 +127,6 @@ static inline void fill_G_into_matrix(matrix **G, matrix *R, uint32_t n, uint32_
                     uint32_t value = R->values[i][j + l];
                     uint32_t pow = int_pow((i2 + 1), l);
                     s += (value * pow);
-
                 }
                 G[i2]->values[i][i1] = s % MOD;
                 i1++;
@@ -169,7 +150,7 @@ static inline void fill_rand_X_into(matrix ** X, uint32_t n, uint32_t k) {
     uint8_t a, a_pow;
     for (uint32_t j = 0; j < n; j++) {
         do {
-            a = safe_next_char();
+            a = rand_next_char();
         } while (array_contains(a_array, j, a) == 1);
 
         a_array[j] = a;
@@ -184,7 +165,7 @@ static inline void rand_A_verified_into_matrix(matrix * A) {
     do {
         for (uint32_t i = 0; i < A->rows; i++) {
             for (uint32_t j = 0; j < A->cols; j++) {
-                A->values[i][j] = (uint32_t)(safe_next_char());
+                A->values[i][j] = (uint32_t)(rand_next_char());
             }
         }
     } while (rank(A) != A->cols || rank(matrix_multiply(matrix_transpose(A),A)) != A->cols);

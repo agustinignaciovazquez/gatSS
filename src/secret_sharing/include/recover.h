@@ -7,6 +7,6 @@
 
 #include "bmp.h"
 
-void recover(uint32_t k, uint32_t n, char *secret_file_name, BMPImage ** shadows, BMPImage * rw);
+void recover(char * filename, BMPImage **shadows, BMPImage *rw,uint32_t k, uint32_t n);
 
 #endif //GATSS_RECOVER_H

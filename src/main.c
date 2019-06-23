@@ -90,7 +90,7 @@ int distribute_mode(cmd_options options) {
         return EXIT_FAILURE;
     }
 
-    distribute(options.k, options.n, secret, bmp_list, watermark);
+    distribute(secret, bmp_list, watermark,options.k, options.n);
 
     return EXIT_SUCCESS;
 
@@ -154,7 +154,7 @@ int recovery_mode(cmd_options options){
         return EXIT_FAILURE;
     }
 
-    recover(options.k, options.n, options.secret, bmp_list, rw_bmp);
+    recover(options.secret, bmp_list, rw_bmp,options.k, options.n);
 
     return EXIT_SUCCESS;
 }
