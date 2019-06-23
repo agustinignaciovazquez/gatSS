@@ -1,8 +1,6 @@
-#include <mod_matrix/mod_matrix.h>
-#include <algorithms/algorithms.h>
-#include <mod_matrix/mod_matrix_macros.h>
+#include "mod_256/include/matrix_operations.h"
 #include <secret_sharing/distribute.h>
-#include "utils.h"
+#include "include/utils.h"
 #include <stdlib.h>
 
 void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage * watermark) {
@@ -11,41 +9,41 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
 
     // Create matrix for the algorithm
 
-    matrix_t ** shares;
+    matrix ** shares;
     shares = malloc(sizeof(*shares)*n);
     total_secret_rows = secret->header.height_px;
     double width_factor = (1.0/k + 1.0/n);
     total_secret_cols = (int)(secret->header.width_px*width_factor);
 
     for (i = 0; i < n; ++i) {
-        shares[i] = mod_matrix_new(total_secret_rows, total_secret_cols);
+        shares[i] = matrix_create_new(total_secret_rows, total_secret_cols);
         shares[i]->rows = total_secret_rows;
         shares[i]->cols = total_secret_cols;
     }
 
     // Create matrix for watermark remainder
-    matrix_t * rw = mod_matrix_new(secret->header.height_px, secret->header.width_px);
+    matrix * rw = matrix_create_new(secret->header.height_px, secret->header.width_px);
 
-    matrix_t * S = mod_matrix_new(n,n);
+    matrix * S = matrix_create_new(n,n);
 
-    matrix_t * W = mod_matrix_new(n, n);
+    matrix * W = matrix_create_new(n, n);
 
-    matrix_t * A = mod_matrix_new(n,k);
+    matrix * A = matrix_create_new(n,k);
 
-    matrix_t ** X = malloc(n * sizeof(matrix_t *));
+    matrix ** X = malloc(n * sizeof(matrix *));
 
     for(i = 0; i < n; i++) {
-        X[i] = mod_matrix_new(k,1);
+        X[i] = matrix_create_new(k,1);
     }
 
-    matrix_t ** V = malloc(n * sizeof(matrix_t *));
+    matrix ** V = malloc(n * sizeof(matrix *));
 
-    matrix_t ** Sh = malloc(n * sizeof(matrix_t *));
+    matrix ** Sh = malloc(n * sizeof(matrix *));
 
-    matrix_t ** G = malloc(n * sizeof(matrix_t *));
+    matrix ** G = malloc(n * sizeof(matrix *));
 
     for(i = 0; i < n; i++) {
-        G[i] = mod_matrix_new(n,2);
+        G[i] = matrix_create_new(n,2);
     }
 
 
@@ -54,29 +52,29 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
 
             create_random_A_matrix(A);
 
-            matrix_t * Sd = projection(A);
+            matrix * Sd = projection(A);
 
             get_sub_matrix_from_image(S, secret, secret_col, secret_row);
 
-            matrix_t * R = mod_matrix_sub(S, Sd);
+            matrix * R = matrix_subtract(S, Sd);
 
             create_random_x_vectors(X, n, k);
 
             // Generate V vectors
             for(int z = 0; z < n; z ++) {
-                V[z] = mod_matrix_mul(A, X[z]);
+                V[z] = matrix_multiply(A, X[z]);
             }
 
             // Generate Rw matrix
             get_sub_matrix_from_image(W, watermark, secret_col, secret_row);
-            matrix_t * current_rw = mod_matrix_sub(W, Sd);
+            matrix * current_rw = matrix_subtract(W, Sd);
             merge_sub_matrix_into_matrix(rw, current_rw, secret_row, secret_col);
-            free(current_rw);
+            matrix_free(current_rw);
 
             generate_G_matrix(G, R, n ,k);
 
             for(i = 0; i < n; i ++) {
-                Sh[i] = merge(V[i], G[i]);
+                Sh[i] = matrix_merge(V[i], G[i]);
             }
 
             for (int l = 0; l < n; l++) {
@@ -89,13 +87,12 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
     hide_shares(shares, shadows, n);
     save_rw_to_image(secret, rw);
 
-    free(A);
-    free(S);
-    free(Sh);
-    free(X);
-    free(V);
-    free(G);
-    free(W);
-    free(rw);
-
+    matrix_free(S);
+    matrix_free(A);
+    matrix_free(W);
+    matrix_free(X);
+    matrix_free(V);
+    matrix_free(rw);
+    matrix_free(Sh);
+    matrix_free(G);
 }

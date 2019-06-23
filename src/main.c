@@ -164,7 +164,7 @@ int recovery_mode(cmd_options options){
 
 int main(int argc, char* argv[]) {
 
-    set_seed(1);
+    rand_set_seed(1);
 
     cmd_options options;
     cmd_status status = parse_args(argc, argv, &options);

@@ -1,5 +1,5 @@
 
-cmake-build-debug/target/test/mod_matrix_test
+cmake-build-debug/target/test/mod_matrixest
 *.cmake
 *.bin
 *.out
@@ -114,14 +114,14 @@ cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix.dir/flags.make
 cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix.dir/link.txt
 cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix.dir/mod_matrix.c.o
 cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix.dir/progress.make
-cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/build.make
-cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/C.includecache
-cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/depend.internal
-cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/depend.make
-cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/flags.make
-cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/link.txt
-cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/progress.make
-cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/test.c.o
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrixest.dir/build.make
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrixest.dir/C.includecache
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrixest.dir/depend.internal
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrixest.dir/depend.make
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrixest.dir/flags.make
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrixest.dir/link.txt
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrixest.dir/progress.make
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrixest.dir/test.c.o
 cmake-build-debug/src/mod_matrix/CMakeFiles/progress.marks
 cmake-build-debug/src/mod_matrix/libmod_matrix.a
 cmake-build-debug/src/mod_matrix/Makefile
@@ -168,3 +168,16 @@ cmake-build-debug/ss.cbp
 cmake-build-debug/target/gatSS
 cmake-build-debug/target/ss
 cmake-build-debug/target/test/mod_test
+cmake-build-debug/target/test/mod_matrix_test
+cmake-build-debug/src/secret_sharing/CMakeFiles/secret_sharing.dir/mod_256/matrix_operations.c.o
+cmake-build-debug/src/secret_sharing/CMakeFiles/secret_sharing.dir/mod_256/matrix_arithmetic.c.o
+cmake-build-debug/src/secret_sharing/CMakeFiles/secret_sharing.dir/mod_256/integer_arithmetic.c.o
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/test.c.o
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/progress.make
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/link.txt
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/flags.make
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/depend.make
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/depend.internal
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/C.includecache
+cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/build.make
+.DS_Store

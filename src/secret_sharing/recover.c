@@ -1,10 +1,9 @@
 #include <bmp/bmp.h>
-#include <mod_matrix/mod_matrix.h>
-#include <algorithms/algorithms.h>
-#include <mod_matrix/mod_matrix_macros.h>
+#include "mod_256/include/matrix_operations.h"
 #include <secret_sharing/recover.h>
 #include <steg/steg.h>
-#include "utils.h"
+#include <stdlib.h>
+#include "include/utils.h"
 
 void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage * rw) {
 
@@ -17,28 +16,28 @@ void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage
     double width_factor = (1.0/k + 1.0/n);
     total_secret_cols = (int)(secret->header.width_px*width_factor);
 
-    matrix_t ** shares = malloc(sizeof(*shares)* k);
+    matrix ** shares = malloc(sizeof(*shares)* k);
     for (i = 0; i < k; i++) {
-        shares[i] = mod_matrix_new(total_secret_rows, total_secret_cols);
+        shares[i] = matrix_create_new(total_secret_rows, total_secret_cols);
     }
 
-    matrix_t ** Sh = malloc(sizeof(*Sh) * k);
+    matrix ** Sh = malloc(sizeof(*Sh) * k);
     for (i = 0; i < k; i++) {
-        Sh[i] = mod_matrix_new(n,3);
+        Sh[i] = matrix_create_new(n,3);
     }
 
-    matrix_t ** G = malloc(sizeof(*G) * k);
+    matrix ** G = malloc(sizeof(*G) * k);
     for (i = 0; i < k; i++) {
-        G[i] = mod_matrix_new(n,2);
+        G[i] = matrix_create_new(n,2);
     }
 
-    matrix_t * B = mod_matrix_new(n, k);
+    matrix * B = matrix_create_new(n, k);
 
-    matrix_t* R = mod_matrix_new(n, n);
+    matrix* R = matrix_create_new(n, n);
 
-    matrix_t * I = mod_matrix_new(k, k);
+    matrix * I = matrix_create_new(k, k);
 
-    matrix_t * Rw = mod_matrix_new(n, n);
+    matrix * Rw = matrix_create_new(n, n);
 
     for (row = 0; row < I->rows; row++) {
         for(col = 0; col < I->cols; col++) {
@@ -46,11 +45,11 @@ void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage
         }
     }
     I = inverse(I);
-    matrix_t * Ii;
-    matrix_t * S;
-    matrix_t * W;
+    matrix * Ii;
+    matrix * S;
+    matrix * W;
 
-    matrix_t * Gg = mod_matrix_new(k,1);
+    matrix * Gg = matrix_create_new(k,1);
 
     for (j = 0; j < k; j++) {
         for (i = 0; i < shadows[j]->header.image_size_bytes; i += n) {
@@ -76,7 +75,7 @@ void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage
                 }
             }
 
-            matrix_t * Sd = projection(B);
+            matrix * Sd = projection(B);
 
             for (i = 0; i < k; i++) {
                 for (row = 0; row < n; row++) {
@@ -92,7 +91,7 @@ void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage
                         Gg->values[i][0] = G[i]->values[row][col];
                     }
 
-                    Ii = mod_matrix_mul(I, Gg);
+                    Ii = matrix_multiply(I, Gg);
 
                     for(i = 0; i < k; i++) {
                         R->values[row][col*k + i] = Ii->values[i][0];
@@ -101,14 +100,14 @@ void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage
                 }
             }
 
-          S = mod_matrix_sum(Sd, R);
+          S = matrix_sum(Sd, R);
           get_sub_matrix_into_image(S, secret, secret_col, secret_row);
 
           /** Create Watermark */
           get_sub_matrix_from_image(Rw, rw, secret_col, secret_row);
-          W = mod_matrix_sum(Sd, Rw);
+          W = matrix_sum(Sd, Rw);
           get_sub_matrix_into_image(W, watermark, secret_col, secret_row);
-          free(W);
+          matrix_free(W);
 
         }
     }

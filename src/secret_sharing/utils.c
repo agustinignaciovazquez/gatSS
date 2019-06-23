@@ -1,16 +1,21 @@
-#include "utils.h"
+#include "include/utils.h"
 #include <steg/steg.h>
 #include <dirent.h>
 #include <bmp/bmp.h>
 #include <string.h>
-#include <mod_matrix/mod_matrix.h>
-#include <mod_matrix/mod_matrix_macros.h>
-#include <algorithms/algorithms.h>
-#include <rand/rand.h>
 
 bool contains(uint8_t *array, int size, uint8_t a);
 
-void hide_shares(matrix_t **shares, BMPImage **shadows, int n) {
+void rand_set_seed(int64_t s){
+    rand_seed = (s ^ 0x5DEECE66DL) & ((1LL << 48) - 1);
+}
+
+uint8_t rand_next_char(void) {
+    rand_seed = (rand_seed * 0x5DEECE66DL + 0xBL) & ((1LL << 48) - 1);
+    return (uint8_t)(rand_seed>>40);
+}
+
+void hide_shares(matrix **shares, BMPImage **shadows, int n) {
 
     FILE * fd;
     BMPImage * shadow;
@@ -36,15 +41,15 @@ void hide_shares(matrix_t **shares, BMPImage **shadows, int n) {
 
 }
 
-void merge_sub_matrix_into_matrix(matrix_t *matrix, matrix_t *sub_matrix, int base_row, int base_col) {
+void merge_sub_matrix_into_matrix(matrix * m, matrix *sub_matrix, int base_row, int base_col) {
     for(int row=0; row < sub_matrix->rows; row++){
         for (int col = 0; col < sub_matrix->cols; col++) {
-            matrix->values[base_row+row][base_col+col] = sub_matrix->values[row][col];
+            m->values[base_row+row][base_col+col] = sub_matrix->values[row][col];
         }
     }
 }
 
-void generate_G_matrix(matrix_t **G, matrix_t *R, int n, int k) {
+void generate_G_matrix(matrix **G, matrix *R, int n, int k) {
     int z = 0;
     for (int t = 0; t < n; t++) {
         int sum = 0;
@@ -74,12 +79,12 @@ bool contains(uint8_t *array, int size, uint8_t a) {
     return 0;
 }
 
-void create_random_x_vectors(matrix_t **X, int n, int k) {
+void create_random_x_vectors(matrix **X, int n, int k) {
     uint8_t * a_array = malloc(sizeof(*a_array)*n);
     uint8_t a, a_pow;
     for (int j = 0; j < n; j++) {
     do {
-        a = safe_next_char();
+        a = modulo(rand_next_char());
     } while (contains(a_array, j, a));
     a_array[j] = a;
     for (int row = 0; row < k; row++) {
@@ -89,19 +94,18 @@ void create_random_x_vectors(matrix_t **X, int n, int k) {
   }
 }
 
-
-void create_random_A_matrix(matrix_t *A) {
+void create_random_A_matrix(matrix *A) {
   do {
     for (int row = 0; row < A->rows; row++) {
       for (int col = 0; col < A->cols; col++) {
-        A->values[row][col] = (uint32_t)safe_next_char();
+        A->values[row][col] = (uint32_t)(modulo(rand_next_char()));
       }
     }
-  } while (rank(A) != A->cols || rank(mod_matrix_mul(mod_matrix_transpose(A),A)) != A->cols);
+  } while (rank(A) != A->cols || rank(matrix_multiply(matrix_transpose(A),A)) != A->cols);
 
 }
 
-void get_sub_matrix_from_image(matrix_t *s, BMPImage *secret, int base_col, int base_row) {
+void get_sub_matrix_from_image(matrix *s, BMPImage *secret, int base_col, int base_row) {
     for(int row=0; row < s->rows; row++ ){
         for (int col = 0; col < s->cols; col++) {
             s->values[row][col] = (uint32_t) secret->data[((base_row+row)*secret->header.width_px) + base_col + col];
@@ -112,7 +116,7 @@ void get_sub_matrix_from_image(matrix_t *s, BMPImage *secret, int base_col, int 
     }
 }
 
-void get_sub_matrix_from_matrix(matrix_t *s, matrix_t *secret, int base_col, int base_row) {
+void get_sub_matrix_from_matrix(matrix *s, matrix *secret, int base_col, int base_row) {
     for(int row=0; row < s->rows; row++ ){
         for (int col = 0; col < s->cols; col++) {
             s->values[row][col] = (uint32_t) secret->values[base_row+row][base_col + col];
@@ -120,7 +124,7 @@ void get_sub_matrix_from_matrix(matrix_t *s, matrix_t *secret, int base_col, int
     }
 }
 
-void get_sub_matrix_into_image(matrix_t *s, BMPImage *secret, int base_col, int base_row) {
+void get_sub_matrix_into_image(matrix *s, BMPImage *secret, int base_col, int base_row) {
     for(int row=0; row < s->rows; row++ ){
         for (int col = 0; col < s->cols; col++) {
             secret->data[((base_row+row)*secret->header.width_px) + base_col + col] = s->values[row][col];
@@ -129,7 +133,7 @@ void get_sub_matrix_into_image(matrix_t *s, BMPImage *secret, int base_col, int 
 }
 
 void
-save_rw_to_image(BMPImage * s, matrix_t * rw) {
+save_rw_to_image(BMPImage * s, matrix * rw) {
   BMPImage * rw_image = copy_bmp(s);
 
   /** Save rw matrix into image */
@@ -202,8 +206,7 @@ int check_shadow_sizes(BMPImage * secret,  BMPImage ** shadows, size_t len, int 
     size_t shadow_size = shadow_size_for(real_byte_count, n, k);
     int i;
 
-    for (i = 0; i < len; i++)
-    {
+    for (i = 0; i < len; i++){
         BMPHeader header = shadows[i]->header;
         size_t shadow_real_byte_count = header.image_size_bytes;
 
@@ -213,6 +216,5 @@ int check_shadow_sizes(BMPImage * secret,  BMPImage ** shadows, size_t len, int 
         }
 
     }
-
     return 0;
 }
