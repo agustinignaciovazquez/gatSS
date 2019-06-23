@@ -4,9 +4,9 @@
 #include "matrix_operations.h"
 #include "utils.h"
 #include <stdlib.h>
-void recover(int k, int n, char *secret_file_name, BMPImage **shadows, BMPImage *rw) {
+void recover(uint32_t k, uint32_t n, char *secret_file_name, BMPImage **shadows, BMPImage *rw) {
 
-    int i = 0, j = 0, row = 0, col = 0, total_secret_rows, total_secret_cols, share_image_pos, secret_pos;
+    uint32_t i = 0, j = 0, row = 0, col = 0, total_secret_rows, total_secret_cols, share_image_pos, secret_pos;
     double width_factor;
 
     // Build the secret and watermark image using the first shadow image as a model

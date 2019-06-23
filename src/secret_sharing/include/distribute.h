@@ -7,7 +7,7 @@
 
 #include "bmp.h"
 
-void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage * watermark);
-void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage * rw);
+void distribute(uint32_t k, uint32_t n, BMPImage * secret, BMPImage ** shadows, BMPImage * watermark);
+void recover(uint32_t k, uint32_t n, char *secret_file_name, BMPImage ** shadows, BMPImage * rw);
 
 #endif //GATSS_DISTRIBUTE_H

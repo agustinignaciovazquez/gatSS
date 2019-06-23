@@ -117,7 +117,7 @@ int write_bmp(BMPImage * image, FILE * fd) {
     return OK;
 }
 
-int is_bmp_file(struct dirent *ep)
+uint32_t is_bmp_file(struct dirent *ep)
 {
     char *filename = ep->d_name;
     size_t len = strlen(filename);
@@ -161,7 +161,7 @@ char ** bmps_in_dir(DIR *dp, int count, int *found) {
         return NULL;
     }
 
-    int i = 0;
+    uint32_t i = 0;
     while ((ep = readdir(dp))) {
         if (is_bmp_file(ep)) {
             bmps[i++] = ep->d_name;
@@ -175,7 +175,7 @@ char ** bmps_in_dir(DIR *dp, int count, int *found) {
 }
 
 BMPImage ** open_files(char ** file_list, int to_open, char *dir) {
-    int i;
+    uint32_t i;
     BMPImage ** bmp_list = malloc(to_open * sizeof(struct bmp_handle*));
     char tmp_filename[MAX_FILENAME_LEN] = {0};
 
@@ -213,7 +213,7 @@ int compare_strings(const void *a, const void *b) {
 }
 
 void print_bmps_info(BMPImage ** bmp_list, char ** file_list, int len) {
-    int i;
+    uint32_t i;
     printf("Loaded images:\n");
     for (i = 0; i < len; i++) {
         BMPHeader * header = &bmp_list[i]->header;
@@ -231,7 +231,7 @@ int check_bmp_sizes(BMPImage ** bmp_list, int len) {
     uint32_t first_width = header.width_px;
     uint32_t first_height = header.height_px;
 
-    int i;
+    uint32_t i;
     for (i = 1; i < len; i++)
     {
         header = bmp_list[i]->header;
@@ -256,8 +256,8 @@ BMPImage * build_image(BMPImage * base) {
     new_image->header.image_size_bytes = base->header.width_px * base->header.height_px;
 
     /* Generacion de la paleta de colores */
-    int jj=3;
-    for(int ii=0;ii<255;ii++){
+    uint32_t jj=3;
+    for(uint32_t ii=0;ii<255;ii++){
         new_image->extra_header[jj+1]=(uint8_t)ii+1;
         new_image->extra_header[jj+2]=(uint8_t)ii+1;
         new_image->extra_header[jj+3]=(uint8_t)ii+1;
