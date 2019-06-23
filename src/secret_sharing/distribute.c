@@ -1,6 +1,6 @@
 #include "matrix_operations.h"
 #include "distribute.h"
-#include "utils.h"
+//#include "utils.h"
 #include <stdlib.h>
 
 void distribute(int k, int n, BMPImage *secret, BMPImage **shadows, BMPImage *watermark) {
@@ -51,7 +51,7 @@ void distribute(int k, int n, BMPImage *secret, BMPImage **shadows, BMPImage *wa
 
         create_random_A_matrix(A);
 
-        matrix *Sd = projection(A);
+        matrix *Sd = matrix_projection(A);
 
         get_sub_matrix_from_image(S, secret, secret_position);
 
