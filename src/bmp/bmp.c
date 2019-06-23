@@ -9,7 +9,7 @@
 #define ERROR -1
 #define OK 1
 
-#define MAX_FILENAME_LEN 255
+#define FILE_MAX_LEN 512
 
 BMPImage * read_bmp(FILE * fd) {
 
@@ -214,7 +214,7 @@ char ** bmps_in_dir(DIR *dp, int count, int *found) {
 BMPImage ** open_files(char ** file_list, int to_open, char *dir) {
     int i;
     BMPImage ** bmp_list = malloc(to_open * sizeof(struct bmp_handle*));
-    char tmp_filename[MAX_FILENAME_LEN] = {0};
+    char tmp_filename[FILE_MAX_LEN] = {0};
 
     if (bmp_list == NULL) {
         return NULL;

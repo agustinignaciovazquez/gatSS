@@ -1,49 +1,54 @@
 #ifndef ARGS_H
 #define ARGS_H
 
-#define MAX_FILENAME_LEN 255
-#define RECOVER_MODE 1
-#define DISTRIBUTE_MODE 2
-#define MAX_FILENAME_LEN 255
-
 #include <stdbool.h>
+#include <limits.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <stdint.h>
 
-/* Enums to report status of parsing commands */
+#define FILE_MAX_LEN 512
 
-typedef enum cmd_status {
-    CMD_SUCCESS, ERROR_D_AND_R, ERROR_NOMODE, ERROR_NOK,
-    ERROR_NOSECRET, ERROR_GETOPT, ERROR_NON, ERROR_NODIR, ERROR_ORDER, ERROR_NOWATER
-} cmd_status;
+/* Status of input */
+
+typedef enum commandStat {
+    SUCCESS, ERROR_DUPMODE, ERROR_MODE, ERROR_NO_N_VALUE, ERROR_NO_K_VALUE, ERROR_NO_SECRET_FILE, ERROR_NO_WATERMARK_FILE, ERROR_NO_DIRECTORY
+} commandStat;
+
+
+typedef enum mode_t
+{
+	NON,
+    DISTRIBUTE,
+    RETRIEVE
+
+} Mode;
 
 /* Command options */
+typedef struct options_t
+{
+    Mode mode;
+    char secret_file_name [FILE_MAX_LEN];
+    char water_mark_file_name [FILE_MAX_LEN];
+    uint8_t  min_shadows_amount;
+    uint8_t  total_amount_of_shadows ;
+    char directory [FILE_MAX_LEN];
 
-typedef struct cmd_options {
-    int mode;
-    char secret[MAX_FILENAME_LEN];
-    char watermark[MAX_FILENAME_LEN];
-    int k;
-    int n;
-    char dir[MAX_FILENAME_LEN];
-    bool verbose;
-} cmd_options;
+} Options;
 
-/* Parses the commands passed to main (argc, argv). Fills the structure cmd_options. Reports parsing status in cmd_status */
-cmd_status parse_args(int argc, char *argv[], struct cmd_options *options);
+/*Prints error status*/
+void printError(commandStat status);
 
-/* Indicates whether an argument is in an incorrect position */
-int arg_invalid_pos(int c, int pos);
+/* Parses the commands recieved by console. Initialize the struct Options. Checks for errors */
+commandStat parseOptions(int argc, char *argv[], Options *options);
 
-/* Validates arguments. Checks if (k,n) scheme is (2,4) or (4,8). Returns a 1 if successful, 0 otherwise */
-int validate_args(struct cmd_options *options);
+/* Verifies if the scheme (k,n) is (2,4) or (4,8) */
+int validateArgs( Options *options);
 
-/* Print cmd_status error if cmd_status is different to CMD_SUCCESS */
-void print_error(cmd_status status);
+/* Prints help */
+void printHelp();
 
-/* Prints cmd_options structure. Information about the loaded arguments */
-void print_args_info(cmd_options *options);
-
-/* Inits the cmd_options structure */
-void init_options(cmd_options * options);
-
+/* Inits the Options structure */
+void paramInit(Options * options);
 
 #endif //MODLIB_ARGS_H
