@@ -60,7 +60,6 @@ void recover(int k, int n, char *secret_file_name, BMPImage **shadows, BMPImage 
             int col = (i/n) % shares[j]->cols;
             int row = (i/n) / shares[j]->cols;
             shares[j]->values[row][col] = recover_lsb(shadows[j]->data + i, n);
-            //TODO ELIMINAR ESTA LINEA shares[j]->values[i / n] = recover_lsb(shadows[j]->data + i, n);
         }
     }
 
@@ -80,7 +79,7 @@ void recover(int k, int n, char *secret_file_name, BMPImage **shadows, BMPImage 
             }
         }
 
-        matrix *Sd = projection(B);
+        matrix *Sd = matrix_projection(B);
 
         // Create G matrix with the shares columns (except for the first one)
         for (i = 0; i < k; i++) {

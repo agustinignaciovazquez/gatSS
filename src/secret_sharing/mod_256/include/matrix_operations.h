@@ -8,7 +8,7 @@
 
 matrix * inverse(matrix * m);
 
-matrix * projection(matrix * m);
+matrix * matrix_projection(matrix * m);
 
 uint32_t rank(matrix * m);
 

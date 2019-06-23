@@ -11,53 +11,42 @@ static inline void swap_rows(matrix *m, uint32_t row1, uint32_t row2);
 matrix * matrix_gauss_algorithm(matrix* m1);
 
 matrix* matrix_gauss_algorithm(matrix* m1){
+    uint32_t lead_coef_row = 0,lead_coef_col = 0, lead_coef_value = 0, temp;
     matrix* m = matrix_create_copy(m1);
 
-    uint32_t pivot_row   = 0;
-    uint32_t pivot_col   = 0;
-    uint32_t pivot_value = 0;
+    while (lead_coef_row < m->rows && lead_coef_col < m->cols) {
+        temp = 0;
 
-    while (pivot_row < m->rows && pivot_col < m->cols) {
-
-        uint32_t temp    = 0;
-
-        /** find the first non-zero remaining in column j */
-        if (find_non_zero_col(m, pivot_row, pivot_col, &temp)) {
-            /** an element was found */
-            pivot_value = m->values[temp][pivot_col];
+        if (find_non_zero_col(m, lead_coef_row, lead_coef_col, &temp) == 0) {
+            lead_coef_value = 0;
         } else {
-            pivot_value = 0;
+            //Found first non-zero element
+            lead_coef_value = m->values[temp][lead_coef_col];
         }
 
-        if (pivot_value == 0) {
+        if (lead_coef_value != 0) {
+            swap_rows(m, lead_coef_row, temp);
 
-            /** The column is negligible, zero it out. */
-            for (uint32_t row = pivot_row; row < m->rows; row++) {
-                m->values[row][pivot_col] = 0;
-            }
-            pivot_col++;
-
-        } else {
-
-            /** Swap i-th and k-th rows. */
-            swap_rows(m, pivot_row, temp);
-
-            /** Divide the pivot row by the pivot element. */
-            for (uint32_t col = pivot_col; col < m->cols; col++) {
-                m->values[pivot_row][col] = divide(m->values[pivot_row][col], pivot_value);
+            for (uint32_t col = lead_coef_col; col < m->cols; col++) {
+                m->values[lead_coef_row][col] = divide(m->values[lead_coef_row][col], lead_coef_value);
             }
 
-            /** Subtract multiples of the pivot row from all the other rows. */
-            for (uint32_t row = (pivot_row == 0 ? 1 : 0); row < m->rows;
-                 row += (row == pivot_row - 1 ? 2 : 1)) {
-                uint32_t pivot_temp = m->values[row][pivot_col];
-                for (uint32_t col = pivot_col; col < m->cols; col++) {
-                    m->values[row][col] = subtract(m->values[row][col], multiply(pivot_temp, m->values[pivot_row][col]));
+            uint32_t row = ((lead_coef_row == 0) ? 1 : 0);
+            do{
+                uint32_t t = m->values[row][lead_coef_col];
+                for (uint32_t col = lead_coef_col; col < m->cols; col++) {
+                    m->values[row][col] = subtract(m->values[row][col], multiply(t, m->values[lead_coef_row][col]));
                 }
-            }
+                row += ((row == (lead_coef_row - 1)) ? 2 : 1);
+            }while ( row < m->rows);
 
-            pivot_row++;
-            pivot_col++;
+            lead_coef_row++;
+            lead_coef_col++;
+        } else {
+            for (uint32_t row = lead_coef_row; row < m->rows; row++) {
+                m->values[row][lead_coef_col] = 0;
+            }
+            lead_coef_col++;
         }
     }
 
@@ -93,7 +82,7 @@ matrix * inverse(matrix * m) {
     uint32_t * * values_i = inverse->values;
     uint32_t * * values_g = gauss->values;
 
-    //Dejando de lado la matriz identidad
+    //Desuamentanto de lado la matriz identidad
     for(uint32_t i = 0; i < inverse->rows; i++) {
         for(uint32_t j = 0; j < inverse->cols; j ++){
             values_i[i][j] = values_g[i][j+m->cols];
@@ -106,7 +95,7 @@ matrix * inverse(matrix * m) {
     return inverse;
 }
 
-matrix * projection(matrix * m) {
+matrix * matrix_projection(matrix * m) {
     matrix * transposed = matrix_transpose(m);
     matrix * a = matrix_multiply(transposed,m);
     matrix * b = inverse(a);
