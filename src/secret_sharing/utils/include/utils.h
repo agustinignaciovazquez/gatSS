@@ -1,9 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <bmp/bmp.h>
+#include "bmp.h"
+#include "matrix_operations.h"
 #include <stdlib.h>
-#include "../mod_256/include/matrix_operations.h"
+
 int64_t rand_seed;
 
 uint8_t rand_next_char(void);

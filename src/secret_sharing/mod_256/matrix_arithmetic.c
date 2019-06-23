@@ -2,7 +2,7 @@
 // Created by Agustin Vazquez on 2019-06-10.
 //
 
-#include "include/matrix_arithmetic.h"
+#include "matrix_arithmetic.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

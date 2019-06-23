@@ -1,10 +1,8 @@
-#include <bmp/bmp.h>
+#include "include/bmp.h"
 
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <mod_matrix/mod_matrix.h>
-#include <logger/logger.h>
 
 #define ERROR -1
 #define OK 1
@@ -251,10 +249,10 @@ int compare_strings(const void *a, const void *b) {
 
 void print_bmps_info(BMPImage ** bmp_list, char ** file_list, int len) {
     int i;
-    LOG_INFO("Loaded images:\n");
+    printf("Loaded images:\n");
     for (i = 0; i < len; i++) {
         BMPHeader * header = &bmp_list[i]->header;
-        LOG_INFO("%s [%ux%u] (Data Offset: 0x%x)\n", file_list[i], header->width_px, header->height_px, header->offset);
+        printf("%s [%ux%u] (Data Offset: 0x%x)\n", file_list[i], header->width_px, header->height_px, header->offset);
     }
 }
 

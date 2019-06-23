@@ -11,7 +11,4 @@ add_compile_options(-pedantic -Wall -O0)
 # ASAN
 #add_compile_options(-fsanitize=address)
 #link_libraries("-fsanitize=address")
-
-include_directories(src/include)
-
 add_subdirectory(src)

@@ -1,6 +1,6 @@
-#include "mod_256/include/matrix_operations.h"
-#include <secret_sharing/distribute.h>
-#include "include/utils.h"
+#include "matrix_operations.h"
+#include "distribute.h"
+#include "utils.h"
 #include <stdlib.h>
 
 void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage * watermark) {
@@ -15,10 +15,8 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
     double width_factor = (1.0/k + 1.0/n);
     total_secret_cols = (int)(secret->header.width_px*width_factor);
 
-    for (i = 0; i < n; ++i) {
+    for (i = 0; i < n; i++) {
         shares[i] = matrix_create_new(total_secret_rows, total_secret_cols);
-        shares[i]->rows = total_secret_rows;
-        shares[i]->cols = total_secret_cols;
     }
 
     // Create matrix for watermark remainder
@@ -45,7 +43,6 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
     for(i = 0; i < n; i++) {
         G[i] = matrix_create_new(n,2);
     }
-
 
     for (secret_row = 0, share_row = 0; secret_row < secret->header.height_px; secret_row += n, share_row += n) {
         for (secret_col = 0, share_col = 0; secret_col < secret->header.width_px; secret_col += n, share_col += 3) {
@@ -87,12 +84,23 @@ void distribute(int k, int n, BMPImage * secret, BMPImage ** shadows, BMPImage *
     hide_shares(shares, shadows, n);
     save_rw_to_image(secret, rw);
 
+
     matrix_free(S);
     matrix_free(A);
     matrix_free(W);
-    matrix_free(X);
-    matrix_free(V);
     matrix_free(rw);
-    matrix_free(Sh);
-    matrix_free(G);
+
+    for(i = 0; i < n; i++) {
+        matrix_free(G[i]);
+        matrix_free(X[i]);
+        matrix_free(Sh[i]);
+        matrix_free(V[i]);
+        matrix_free(shares[i]);
+    }
+
+    free(G);
+    free(X);
+    free(Sh);
+    free(V);
+    free(shares);
 }

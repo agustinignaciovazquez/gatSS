@@ -2,7 +2,7 @@
 // Created by Agustin Vazquez on 2019-06-10.
 //
 
-#include "include/integer_arithmetic.h"
+#include "integer_arithmetic.h"
 
 uint32_t sum(uint32_t a, uint32_t b){
     return modulo(a + b);

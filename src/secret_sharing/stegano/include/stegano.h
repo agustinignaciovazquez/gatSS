@@ -16,5 +16,4 @@ uint8_t recover_lsb_width2(uint8_t *bytes, size_t pos);
 
 uint8_t recover_lsb_width1(uint8_t *bytes, size_t pos);
 
-
 #endif // STEG_H

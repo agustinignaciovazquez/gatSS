@@ -1,9 +1,10 @@
-#include <bmp/bmp.h>
-#include "mod_256/include/matrix_operations.h"
-#include <secret_sharing/recover.h>
-#include <steg/steg.h>
+#include "bmp.h"
+#include "recover.h"
+#include "stegano.h"
+#include "matrix_operations.h"
+#include "utils.h"
 #include <stdlib.h>
-#include "include/utils.h"
+
 
 void recover(int k, int n, char *secret_file_name, BMPImage ** shadows, BMPImage * rw) {
 

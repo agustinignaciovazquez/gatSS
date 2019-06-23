@@ -1,5 +1,9 @@
-#ifndef ARGS_H
-#define ARGS_H
+//
+// Created by Agustin Vazquez on 2019-06-21.
+//
+
+#ifndef GATSS_PARSER_H
+#define GATSS_PARSER_H
 
 #define MAX_FILENAME_LEN 255
 #define RECOVER_MODE 1
@@ -45,5 +49,4 @@ void print_args_info(cmd_options *options);
 /* Inits the cmd_options structure */
 void init_options(cmd_options * options);
 
-
-#endif //MODLIB_ARGS_H
+#endif //GATSS_PARSER_H

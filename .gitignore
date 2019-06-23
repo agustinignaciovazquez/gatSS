@@ -181,3 +181,14 @@ cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/depend.internal
 cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/C.includecache
 cmake-build-debug/src/mod_matrix/CMakeFiles/mod_matrix_test.dir/build.make
 .DS_Store
+cmake-build-debug/src/CMakeFiles/gatSS.dir/parser/parser.c.o
+cmake-build-debug/src/CMakeFiles/gatSS.dir/secret_sharing/bmp/bmp.c.o
+cmake-build-debug/src/CMakeFiles/gatSS.dir/secret_sharing/distribute.c.o
+cmake-build-debug/src/CMakeFiles/gatSS.dir/secret_sharing/mod_256/integer_arithmetic.c.o
+cmake-build-debug/src/CMakeFiles/gatSS.dir/secret_sharing/mod_256/matrix_arithmetic.c.o
+cmake-build-debug/src/CMakeFiles/gatSS.dir/secret_sharing/mod_256/matrix_operations.c.o
+cmake-build-debug/src/CMakeFiles/gatSS.dir/secret_sharing/recover.c.o
+cmake-build-debug/src/CMakeFiles/gatSS.dir/secret_sharing/stegano/stegano.c.o
+cmake-build-debug/src/CMakeFiles/gatSS.dir/secret_sharing/utils/utils.c.o
+cmake-build-debug/src/parser/CMakeFiles/progress.marks
+cmake-build-debug/src/parser/Makefile

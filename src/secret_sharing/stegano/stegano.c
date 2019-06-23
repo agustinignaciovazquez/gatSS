@@ -1,7 +1,6 @@
-#include <steg/steg.h>
+#include "stegano.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <logger/logger.h>
 
 #define BIT(n) (0x01 << (n))
 #define GET_BIT(x, n) (((x) >> (n)) & 1)
@@ -22,7 +21,7 @@ uint8_t recover_lsb(uint8_t *bytes, int n){
         return recover_lsb_width1(bytes, 0);
     }
 
-    LOG_ERROR("recover_lsb has not been implemented for n!=4 && n!=8\n");
+    printf("Error incorrect N (we only accept 4 or 8)\n");
     exit(EXIT_FAILURE);
 }
 

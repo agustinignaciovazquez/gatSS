@@ -1,7 +1,8 @@
 #include "include/utils.h"
-#include <steg/steg.h>
+#include "stegano.h"
+#include "bmp.h"
 #include <dirent.h>
-#include <bmp/bmp.h>
+
 #include <string.h>
 
 bool contains(uint8_t *array, int size, uint8_t a);
@@ -13,6 +14,14 @@ void rand_set_seed(int64_t s){
 uint8_t rand_next_char(void) {
     rand_seed = (rand_seed * 0x5DEECE66DL + 0xBL) & ((1LL << 48) - 1);
     return (uint8_t)(rand_seed>>40);
+}
+
+uint8_t safe_next_char(void) {
+    uint8_t  r;
+    do {
+        r = rand_next_char();
+    }while(r >= 251);
+    return r;
 }
 
 void hide_shares(matrix **shares, BMPImage **shadows, int n) {
@@ -84,25 +93,29 @@ void create_random_x_vectors(matrix **X, int n, int k) {
     uint8_t a, a_pow;
     for (int j = 0; j < n; j++) {
     do {
-        a = modulo(rand_next_char());
+        a = safe_next_char();
     } while (contains(a_array, j, a));
     a_array[j] = a;
     for (int row = 0; row < k; row++) {
         a_pow = (uint8_t) (int_pow(a, row) % MOD);
         X[j]->values[row][0] = a_pow;
     }
+
   }
 }
 
 void create_random_A_matrix(matrix *A) {
+    int i = 0;
   do {
     for (int row = 0; row < A->rows; row++) {
       for (int col = 0; col < A->cols; col++) {
-        A->values[row][col] = (uint32_t)(modulo(rand_next_char()));
+        A->values[row][col] = (uint32_t)(safe_next_char());
       }
     }
-  } while (rank(A) != A->cols || rank(matrix_multiply(matrix_transpose(A),A)) != A->cols);
+      i++;
 
+  } while (rank(A) != A->cols || rank(matrix_multiply(matrix_transpose(A),A)) != A->cols);
+    matrix_print(A);
 }
 
 void get_sub_matrix_from_image(matrix *s, BMPImage *secret, int base_col, int base_row) {

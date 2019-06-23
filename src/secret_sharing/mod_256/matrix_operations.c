@@ -2,15 +2,15 @@
 // Created by Agustin Vazquez on 2019-06-15.
 //
 
-#include "include/matrix_operations.h"
+#include "matrix_operations.h"
 #include <stdio.h>
 #include <string.h>
 
 static inline uint8_t find_non_zero_col(const matrix *matrix, uint32_t start, uint32_t col, uint32_t *r);
 static inline void swap_rows(matrix *m, uint32_t row1, uint32_t row2);
-matrix * matrix_gauss_algorithm(const matrix* m1);
+matrix * matrix_gauss_algorithm(matrix* m1);
 
-matrix* matrix_gauss_algorithm(const matrix* m1){
+matrix* matrix_gauss_algorithm(matrix* m1){
     matrix* m = matrix_create_copy(m1);
 
     uint32_t pivot_row   = 0;
@@ -79,6 +79,7 @@ uint32_t rank(matrix * m) {
         }
         c = 0;
     }
+
     uint32_t ans = m->cols - r;
     matrix_free(gm);
     return ans;
