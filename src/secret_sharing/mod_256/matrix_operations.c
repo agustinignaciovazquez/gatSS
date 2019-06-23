@@ -65,7 +65,7 @@ matrix* matrix_gauss_algorithm(matrix* m1){
 }
 
 uint32_t rank(matrix * m) {
-    matrix * gm = matrix_gauss_algorithm(matrixranspose(m));
+    matrix * gm = matrix_gauss_algorithm(matrix_transpose(m));
     uint32_t r = 0,c = 0;
 
     for (uint32_t row = 0; row < gm->rows; row++) {
@@ -107,7 +107,7 @@ matrix * inverse(matrix * m) {
 }
 
 matrix * projection(matrix * m) {
-    matrix * transposed = matrixranspose(m);
+    matrix * transposed = matrix_transpose(m);
     matrix * a = matrix_multiply(transposed,m);
     matrix * b = inverse(a);
     matrix * c = matrix_multiply(m, b);

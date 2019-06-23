@@ -34,7 +34,7 @@ matrix * matrix_identity(uint32_t rows, uint32_t cols) {
     return r;
 }
 
-matrix* matrixranspose(matrix* m){
+matrix* matrix_transpose(matrix* m){
     matrix* r = matrix_create_new(m->cols, m->rows);
     uint32_t * * values_r = r->values;
     uint32_t * * values_m = m->values;
@@ -50,7 +50,7 @@ matrix* matrixranspose(matrix* m){
 
 matrix* matrix_multiply(matrix* a, matrix* b){
     if (a->cols != b->rows) {
-        printf("Incorrect multiply matrix dimensions!");
+        printf("Multiply: Incorrect matrix dimensions!");
         exit(EXIT_FAILURE);
     }
 
@@ -80,7 +80,7 @@ matrix * matrix_create_copy(matrix * m){
 
 void matrix_copy(matrix * from, matrix * to){
     if (from->rows != to->rows || from->cols != to->cols) {
-        printf("Incorrect matrix dimensions!");
+        printf("Copy: Incorrect matrix dimensions!");
         exit(EXIT_FAILURE);
     }
 
@@ -97,7 +97,7 @@ void matrix_copy(matrix * from, matrix * to){
 
 matrix * matrix_merge(matrix * a, matrix * b) {
     if (a->rows != b->rows) {
-        printf("Incorrect matrix dimensions!");
+        printf("Merge: Incorrect matrix dimensions!");
         exit(EXIT_FAILURE);
     }
 
@@ -173,7 +173,7 @@ static inline uint32_t * * create_dynamic_matrix(uint32_t rows, uint32_t cols){
 
 static inline matrix * matrix_apply_op(matrix* a,matrix* b,uint32_t (*f)(uint32_t, uint32_t)){
     if (a->cols != b->cols || a->rows != b->rows) {
-        printf("Incorrect matrix dimension!");
+        printf("Operation +/-: Incorrect matrix dimension!");
         exit(EXIT_FAILURE);
     }
 

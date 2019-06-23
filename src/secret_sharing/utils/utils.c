@@ -103,7 +103,7 @@ void create_random_A_matrix(matrix *A) {
                 A->values[row][col] = (uint32_t) safe_next_char();
             }
         }
-    } while (rank(A) != A->cols || rank(matrix_multiply(matrixranspose(A), A)) != A->cols);
+    } while (rank(A) != A->cols || rank(matrix_multiply(matrix_transpose(A), A)) != A->cols);
 
 }
 
@@ -137,8 +137,8 @@ void get_sub_matrix_into_image(matrix *s, BMPImage *secret, int base_position){
 
 void get_sub_matrix_into_matrix(matrix *m, matrix *sub_matrix, int base_position) {
     for (int position = 0; position < sub_matrix->rows * sub_matrix->cols; position++) {
-        int col = (base_position + position) % sub_matrix->cols;
-        int row = (base_position + position) / sub_matrix->cols;
+        int col = (base_position + position) % m->cols;
+        int row = (base_position + position) / m->cols;
         m->values[row][col] = sub_matrix->values[(position) / sub_matrix->cols][position % sub_matrix->cols];
     }
 }

@@ -26,7 +26,7 @@ matrix* matrix_subtract(matrix* m1, matrix* m2);
 
 matrix* matrix_multiply(matrix* a, matrix* m2);
 
-matrix* matrixranspose(matrix* m);
+matrix* matrix_transpose(matrix* m);
 
 matrix * matrix_create_copy(matrix * m);
 
