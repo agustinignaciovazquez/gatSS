@@ -35,7 +35,7 @@ void get_sub_matrix_from_image(matrix * sm, BMPImage * s, uint32_t base) {
         uint32_t j = (k) % sm->cols;
         uint32_t i = (k) / sm->cols;
         t = (uint32_t) s->data[base + k];
-        sm->values[i][j] = (t > 250)? 250 : t;
+        sm->values[i][j] = (t > 250)?250:t;
     }
 }
 
@@ -67,7 +67,7 @@ uint32_t int_pow(uint32_t x, uint32_t y) {
 }
 
 
-size_t shadow_size_for(uint32_t image_size, uint32_t n, uint32_t k) {
+static inline size_t shadow_size_for(uint32_t image_size, uint32_t n, uint32_t k) {
     uint32_t lsb_bytes;
     if (k == 4) {
         lsb_bytes = 8;
