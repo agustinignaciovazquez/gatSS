@@ -36,45 +36,118 @@ typedef struct {
     uint8_t * extra_header;
 } BMPImage;
 
-/* Read a BMP Image from the file descriptor fd */
+/**
+ * @brief Read a BMP Image from the file descriptor fd
+ *
+ * @param FILE * fd
+ * @return BMPImage*
+ */
 BMPImage * read_bmp(FILE * fd);
 
-/* Write a BMP Image into the file descriptor fd */
+/**
+ * @brief Write a BMP Image into the file descriptor fd
+ *
+ * @param FILE * fd
+ * @param BMPImage * image
+ * @return int
+ */
 int write_bmp(BMPImage * image, FILE * fd);
 
-/* Free a BMP Image */
+/**
+ * @brief Free a BMP Image
+ *
+ * @param BMPImage * image
+ * @return void
+ */
 void free_bmp(BMPImage * image);
 
-/* Copy a BMP Image */
+/**
+ * @brief Copy a BMP Image
+ *
+ * @param BMPImage * src
+ * @return BMPImage*
+ */
 BMPImage * copy_bmp(BMPImage * src);
 
-/* Checks if BMP Image has valid header */
+/**
+ * @brief Checks if BMP Image has valid header
+ *
+ * @param BMPHeader * header
+ * @return bool
+ */
 bool bmp_valid_header(BMPHeader * header);
 
-/* Creates a new BMP Image */
+/**
+ * @brief Creates a new BMP Image
+ *
+ * @return BMPImage*
+ */
 BMPImage * new_bmp_image();
 
-BMPImage * create_bmp(const uint8_t* values, uint32_t h, uint32_t w, uint8_t * extraHeader);
-
-/* Returns a list of with the files (strings) that are bmp in dp directory.
- * count: specifies how many bmps should we find in this directory.
- * found: specifies how many bmps we actually found in this directory.
- * */
+/**
+ * @brief Returns a list of with the files (strings) that are bmp in dp directory.
+ *
+ * @param int count: specifies how many bmps should we find in this directory.
+ * @param int found: specifies how many bmps we actually found in this directory
+ * @param DIR *dp
+ * @return char**
+ */
 char ** bmps_in_dir(DIR *dp, int count, int * found);
 
-/* Frees a list of bmp file names */
+/**
+ * @brief Frees a list of bmp file names
+ *
+ * @param BMPImage** bmp_list
+ * @param int len
+ * @return void
+ */
 void bmp_free_list(BMPImage ** bmp_list, int len);
 
-/* A utility function used to sort the bmp files */
+/**
+ * @brief A utility function used to sort the bmp files
+ *
+ * @param const void *a
+ * @param const void *b
+ * @return void
+ */
 int compare_strings(const void *a, const void *b);
 
-/* Opens all bmp files specified by file_list */
+/**
+ * @brief A utility function used to sort the bmp files
+ *
+ * @param char ** file_list
+ * @param int to_open
+ * @param char *dir
+ * @return BMPImage **
+ */
 BMPImage ** open_files(char ** file_list, int to_open, char *dir);
 
-/* Prints information about the bmp files opened */
+/**
+* @brief Prints information about the bmp files opened
+*
+* @param BMPImage ** bmp_list
+* @param char ** file_list
+* @param int len
+* @return void
+*/
 void print_bmps_info(BMPImage ** bmp_list, char ** file_list, int len);
 
+/**
+* @brief Check if the size of bmp are the correct ones
+*
+* @param BMPImage ** bmp_list
+* @param int len
+* @return int
+*/
 int check_bmp_sizes(BMPImage ** bmp_list, int len);
+
+/**
+* @brief Build an image
+*
+* @param BMPImage * base
+* @return BMPImage *
+*/
+BMPImage * build_image(BMPImage * base);
 
 #endif // BMP_BMP_H
 

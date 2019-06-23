@@ -117,41 +117,6 @@ int write_bmp(BMPImage * image, FILE * fd) {
     return OK;
 }
 
-
-BMPImage *
-create_bmp(const uint8_t * values, uint32_t h, uint32_t w, uint8_t * extraHeader)
-{
-    BMPImage * image = new_bmp_image();
-
-    image->header.type =  0x4d42;
-    image->header.size = h*w + 1078;
-    image->header.reserved1 = 0;
-    image->header.reserved2 = 0;
-    image->header.offset = 54;
-    image->header.dib_header_size = 40;
-    image->header.width_px = w;
-    image->header.height_px = h;
-    image->header.num_planes = 1;
-    image->header.bits_per_pixel = 8;
-    image->header.compression = 0;
-    image->header.image_size_bytes = w*h;
-    image->header.x_resolution_ppm = 0;
-    image->header.y_resolution_ppm = 0;
-    image->header.num_colors = 256;
-    image->header.important_colors = 0;
-
-    image->extra_header = calloc(1078, 1);
-    image->data = malloc(w*h);
-    for (int i = 0; i < h; ++i) {
-        for (int j = 0; j < w; ++j) {
-            image->data[i*w + j] = (uint8_t) values[i*w + j];
-        }
-    }
-
-    return image;
-
-}
-
 int is_bmp_file(struct dirent *ep)
 {
     char *filename = ep->d_name;
@@ -279,3 +244,26 @@ int check_bmp_sizes(BMPImage ** bmp_list, int len) {
 
     return 0;
 }
+
+BMPImage * build_image(BMPImage * base) {
+    BMPImage * new_image = copy_bmp(base);
+    new_image->extra_header = calloc(256 * 4, sizeof(uint8_t)); //Reservar espacio para la paleta de colores
+    new_image->header.bits_per_pixel = 8; // 8 bits por pixel
+    new_image->header.size = base->header.width_px * base->header.height_px + 1024;
+    // El tamaño completo de la imagen es width * heigth + el espacio de la paleta
+    new_image->header.offset = 1078; //Es 54 + 1024
+    new_image->header.num_colors = 256; // 256 colores
+    new_image->header.image_size_bytes = base->header.width_px * base->header.height_px;
+
+    /* Generacion de la paleta de colores */
+    int jj=3;
+    for(int ii=0;ii<255;ii++){
+        new_image->extra_header[jj+1]=(uint8_t)ii+1;
+        new_image->extra_header[jj+2]=(uint8_t)ii+1;
+        new_image->extra_header[jj+3]=(uint8_t)ii+1;
+        jj=jj+4;
+    }
+
+    return new_image;
+}
+

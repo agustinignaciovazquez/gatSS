@@ -34,7 +34,7 @@ matrix * matrix_identity(uint32_t rows, uint32_t cols) {
     return r;
 }
 
-matrix* matrix_transpose(matrix* m){
+matrix* matrixranspose(matrix* m){
     matrix* r = matrix_create_new(m->cols, m->rows);
     uint32_t * * values_r = r->values;
     uint32_t * * values_m = m->values;
