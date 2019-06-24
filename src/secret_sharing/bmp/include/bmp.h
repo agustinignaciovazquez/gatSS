@@ -62,19 +62,16 @@ void bmp_free(BMPImage * image);
 void bmp_free_list(BMPImage ** bmp_list, int len);
 
 /* Used to order the bmp files */
-BMPImage ** bpm_open_files(char ** file_list, int to_open, char *dir);
+BMPImage ** bmp_open_files(char ** file_list, int to_open, char *dir);
 
 /* Used to order the bmp files */
 char ** bmps_in_dir(DIR *dp, int count, int * found);
-
-/*Prints information about the bmp files opened*/
-void bmp_print_info(BMPImage ** bmp_list, char ** file_list, int len);
 
 /* Compares the bmp filenames*/
 int compare_strings(const void *a, const void *b);
 
 /* Checks if bmp file sizes are the expected ones */
-int check_bmp_sizes(BMPImage ** bmp_list, int len);
+int bmp_check_size(BMPImage ** bmp_list, int len);
 
 /* Checks if BMP Image header is valid */
 bool bmp_valid_header(BMPHeader * header);

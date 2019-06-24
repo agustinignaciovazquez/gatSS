@@ -1,4 +1,4 @@
-#include "include/bmp.h"
+#include "bmp.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -80,8 +80,6 @@ void bmp_free(BMPImage * image) {
 int get_header2_size(BMPImage * image) {
     return image->header.offset - sizeof(image->header);
 }
-
-
 
 /* Copies an image */
 
@@ -212,15 +210,6 @@ int compare_strings(const void *a, const void *b) {
     return strcmp(*(char**)a, *(char**)b);
 }
 
-void bmp_print_info(BMPImage ** bmp_list, char ** file_list, int len) {
-    uint32_t i;
-    printf("Loaded images:\n");
-    for (i = 0; i < len; i++) {
-        BMPHeader * header = &bmp_list[i]->header;
-        printf("%s [%ux%u] (Data Offset: 0x%x)\n", file_list[i], header->width, header->height, header->offset);
-    }
-}
-
 int bmp_check_size(BMPImage ** bmp_list, int len) {
     if (len < 2)
     {
@@ -247,15 +236,14 @@ int bmp_check_size(BMPImage ** bmp_list, int len) {
 
 BMPImage * build_image(BMPImage * base) {
     BMPImage * new_image = copy_bmp(base);
-    new_image->header2 = calloc(256 * 4, sizeof(uint8_t)); //Reservar espacio para la paleta de colores
-    new_image->header.bits_per_pixel = 8; // 8 bits por pixel
+    new_image->header2 = calloc(256 * 4, sizeof(uint8_t));
+    new_image->header.bits_per_pixel = 8;
     new_image->header.size = base->header.width * base->header.height + 1024;
-    // El tamaño completo de la imagen es width * heigth + el espacio de la paleta
-    new_image->header.offset = 1078; //Es 54 + 1024
-    new_image->header.color_table_size = 256; // 256 colores
+
+    new_image->header.offset = 1078;
+    new_image->header.color_table_size = 256;
     new_image->header.image_size_bytes = base->header.width * base->header.height;
 
-    /* Generacion de la paleta de colores */
     uint32_t jj=3;
     for(uint32_t ii=0;ii<255;ii++){
         new_image->header2[jj+1]=(uint8_t)ii+1;

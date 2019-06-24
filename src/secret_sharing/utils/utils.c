@@ -49,30 +49,3 @@ uint32_t int_pow(uint32_t x, uint32_t y) {
     }
     return ret;
 }
-
-static inline size_t shadow_size_for(uint32_t image_size, uint32_t n, uint32_t k) {
-    uint32_t lsb_bytes;
-    if (k == 4) {
-        lsb_bytes = 8;
-    } else {
-        lsb_bytes = 4;
-    }
-    double factor = (1.0 / k + 1.0 / n);
-
-    return image_size * factor * lsb_bytes;
-}
-
-uint32_t check_shadow_sizes(BMPImage *secret, BMPImage **shadows, size_t len, uint32_t n, uint32_t k) {
-    BMPHeader secret_header = secret->header;
-    uint32_t real_byte_count = secret_header.width * secret_header.height;
-    size_t shadow_size = shadow_size_for(real_byte_count, n, k);
-
-    for (uint32_t i = 0; i < len; i++) {
-        BMPHeader header = shadows[i]->header;
-        size_t byte_count = header.image_size_bytes;
-        if (byte_count != shadow_size) {
-            return -1;
-        }
-    }
-    return 0;
-}

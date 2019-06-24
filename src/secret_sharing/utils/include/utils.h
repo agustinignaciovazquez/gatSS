@@ -17,6 +17,4 @@ void sm_from_bmp(matrix *sm, BMPImage * s, uint32_t base);
 
 void sm_merge_matrix(matrix * m, matrix * sm, uint32_t base);
 
-uint32_t check_shadow_sizes(BMPImage * secret,  BMPImage ** shadows, size_t len, uint32_t n, uint32_t k);
-
 #endif // UTILS_H
