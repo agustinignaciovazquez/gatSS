@@ -55,7 +55,7 @@ BMPImage * bmp_read(FILE * fd) {
         return NULL;
     }
 
-    return image;
+    return img;
 
 }
 

@@ -7,30 +7,19 @@
 #include "recover.h"
 #include "parser.h"
 
-static inline size_t shadow_size_for(uint32_t image_size, uint32_t n, uint32_t k) {
-    uint32_t lsb_bytes;
-    if (k == 4) {
-        lsb_bytes = 8;
-    } else {
-        lsb_bytes = 4;
-    }
-    double factor = (1.0 / k + 1.0 / n);
-
-    return image_size * factor * lsb_bytes;
-}
-
-static inline uint32_t check_shadow_sizes(BMPImage *secret, BMPImage **shadows, size_t len, uint32_t n, uint32_t k) {
-    BMPHeader secret_header = secret->header;
+static inline uint32_t check_shadows(BMPImage *sec, BMPImage **shadows, size_t l, uint32_t n, uint32_t k) {
+    BMPHeader secret_header = sec->header;
     uint32_t real_byte_count = secret_header.width * secret_header.height;
-    size_t shadow_size = shadow_size_for(real_byte_count, n, k);
+    size_t shadow_size = real_byte_count * (1.0 / k + 1.0 / n) * ((k == 4)? 8:4);
 
-    for (uint32_t i = 0; i < len; i++) {
+    for (uint32_t i = 0; i < l; i++) {
         BMPHeader header = shadows[i]->header;
         size_t byte_count = header.image_size_bytes;
         if (byte_count != shadow_size) {
             return -1;
         }
     }
+
     return 0;
 }
 
@@ -54,11 +43,6 @@ int distribute_mode(Options options) {
         return EXIT_FAILURE;
     }
 
-
-    if (found > options.total_amount_of_shadows) {
-        printf("more than N = %d files were found, using N first files.\n", options.total_amount_of_shadows);
-
-    }
 
     /* Open n images */
     to_open = options.total_amount_of_shadows;
@@ -111,7 +95,7 @@ int distribute_mode(Options options) {
     }
 
 
-    if (check_shadow_sizes(secret, bmp_list, to_open, options.total_amount_of_shadows, options.min_shadows_amount)) {
+    if (check_shadows(secret, bmp_list, to_open, options.total_amount_of_shadows, options.min_shadows_amount)) {
         printf("Error: one or more of the shadow images does not have the required size.\n");
         bmp_free(secret);
         free(bmp_list);
