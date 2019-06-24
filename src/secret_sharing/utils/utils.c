@@ -50,7 +50,6 @@ uint32_t int_pow(uint32_t x, uint32_t y) {
     return ret;
 }
 
-
 static inline size_t shadow_size_for(uint32_t image_size, uint32_t n, uint32_t k) {
     uint32_t lsb_bytes;
     if (k == 4) {

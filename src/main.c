@@ -7,9 +7,9 @@
 
 #include <stdlib.h>
 
-int distribute_mode(cmd_options options) {
+int distribute_mode(Options options) {
 
-    DIR * dp = opendir(options.dir);
+    DIR * dp = opendir(options.directory);
 
     if(dp == NULL) {
         printf("Unable to open directory\n");
@@ -20,15 +20,17 @@ int distribute_mode(cmd_options options) {
     int found = 0, to_open = 0;
 
     /* Count should be n, we need n image shares */
-    file_list = bmps_in_dir(dp, options.n, &found);
+    file_list = bmps_in_dir(dp, options.total_amount_of_shadows, &found);
     /* found contains how many we actually found */
     if(file_list == NULL) {
         printf("Unable to open the files inside the directory\n");
         return EXIT_FAILURE;
     }
 
-    if (found > options.n) {
-        printf("more than N = %d files were found, using N first files.\n", options.n);
+
+    if (found > options.total_amount_of_shadows) {
+        printf("more than N = %d files were found, using N first files.\n", options.total_amount_of_shadows);
+
     }
 
     /* Open n images */
@@ -49,7 +51,7 @@ int distribute_mode(cmd_options options) {
 
     bmp_print_info(bmp_list, file_list, to_open);
 
-    FILE * watermark_fd = fopen(options.watermark, "rb");
+    FILE * watermark_fd = fopen(options.water_mark_file_name, "rb");
 
     if(watermark_fd == NULL) {
         printf("Unable to open watermark\n");
@@ -58,7 +60,7 @@ int distribute_mode(cmd_options options) {
 
     BMPImage * watermark = bmp_read(watermark_fd);
 
-    FILE * secret_fd = fopen(options.secret, "rb");
+    FILE * secret_fd = fopen(options.secret_file_name, "rb");
 
     if(secret_fd == NULL) {
         printf("Unable to open secret image\n");
@@ -83,21 +85,22 @@ int distribute_mode(cmd_options options) {
         return EXIT_FAILURE;
     }
 
-    if (check_shadow_sizes(secret, bmp_list, to_open, options.n, options.k)) {
+
+    if (check_shadow_sizes(secret, bmp_list, to_open, options.total_amount_of_shadows, options.min_shadows_amount)) {
         printf("Error: one or more of the shadow images does not have the required size.\n");
         bmp_free(secret);
         free(bmp_list);
         return EXIT_FAILURE;
     }
 
-    distribute(secret, bmp_list, watermark,options.k, options.n);
+    distribute( secret, bmp_list, watermark, options.min_shadows_amount, options.total_amount_of_shadows);
 
     return EXIT_SUCCESS;
 
 }
 
-int recovery_mode(cmd_options options){
-    DIR * dp = opendir(options.dir);
+int recovery_mode(Options options){
+    DIR * dp = opendir(options.directory);
 
     if(dp == NULL) {
         printf("Unable to open directory\n");
@@ -108,7 +111,7 @@ int recovery_mode(cmd_options options){
     int found = 0, to_open = 0;
 
     /* Count should be n, we need n image shares */
-    file_list = bmps_in_dir(dp, options.k, &found);
+    file_list = bmps_in_dir(dp, options.min_shadows_amount, &found);
     /* found contains how many we actually found */
 
     if(file_list == NULL) {
@@ -117,12 +120,13 @@ int recovery_mode(cmd_options options){
     }
 
 
-    if (found > options.k) {
-        printf("more than K = %d files were found, using K first files.\n", options.k);
+    if (found > options.min_shadows_amount) {
+        printf("more than K = %d files were found, using K first files.\n", options.min_shadows_amount);
+
     }
 
     /* Open n images */
-    to_open = options.k;
+    to_open = options.min_shadows_amount;
 
     BMPImage ** bmp_list = bmp_open_files(file_list, to_open, options.dir);
 
@@ -140,7 +144,7 @@ int recovery_mode(cmd_options options){
 
     bmp_print_info(bmp_list, file_list, to_open);
 
-    FILE * rw_fd = fopen(options.watermark, "rb");
+    FILE * rw_fd = fopen(options.water_mark_file_name, "rb");
 
     if(rw_fd == NULL) {
         printf("Unable to open watermark\n");
@@ -154,7 +158,7 @@ int recovery_mode(cmd_options options){
         return EXIT_FAILURE;
     }
 
-    recover(options.secret, bmp_list, rw_bmp,options.k, options.n);
+    recover( options.secret_file_name, bmp_list, rw_bmp, options.min_shadows_amount, options.total_amount_of_shadows);
 
     return EXIT_SUCCESS;
 }
@@ -163,22 +167,20 @@ int main(int argc, char* argv[]) {
 
     rand_set_seed(1);
 
-    cmd_options options;
-    cmd_status status = parse_args(argc, argv, &options);
+    Options options;
+    commandStat status = parseOptions(argc, argv, &options);
 
-    if(status != CMD_SUCCESS) {
-        print_error(status);
+    if(status != SUCCESS) {
+        printError(status);
         return EXIT_FAILURE;
     }
-    if (validate_args(&options)){
+    if (validateArgs(&options)){
         return EXIT_FAILURE;
     }
 
-    print_args_info(&options);
-
-    if(options.mode == DISTRIBUTE_MODE){
+    if(options.mode == DISTRIBUTE){
         return distribute_mode(options);
-    } else if (options.mode == RECOVER_MODE){
+    } else if (options.mode == RETRIEVE){
         return recovery_mode(options);
     }
 
