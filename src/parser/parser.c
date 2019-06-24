@@ -71,7 +71,7 @@ commandStat parseOptions(int argc, char **argv, Options * options){
 
         case 's':
           arglen = strlen(optarg);
-          if (arglen > FILE_MAX_LEN - 1 || arglen == 0) {
+          if (arglen == 0 || arglen > FILE_MAX_LEN - 1 ) {
             return ERROR_NO_SECRET_FILE;
           }
           strcpy(options->secret_file_name, optarg);
@@ -80,7 +80,7 @@ commandStat parseOptions(int argc, char **argv, Options * options){
 
         case 'm':
           arglen = strlen(optarg);
-          if (arglen > FILE_MAX_LEN - 1 || arglen == 0) {
+          if (arglen == 0 || arglen > FILE_MAX_LEN - 1) {
             return ERROR_NO_WATERMARK_FILE;
           }
           strcpy(options->water_mark_file_name, optarg);
@@ -99,7 +99,7 @@ commandStat parseOptions(int argc, char **argv, Options * options){
 
         case 'i':
           arglen = strlen(optarg);
-          if (arglen > FILE_MAX_LEN - 1 || arglen == 0) {
+          if ( arglen == 0 || arglen > FILE_MAX_LEN - 1 ) {
             return ERROR_NO_DIRECTORY;
           }
           strcpy(options->directory, optarg);
@@ -168,10 +168,10 @@ void paramInit(Options * options){
 
 }
 
-int validateArgs(Options *options){
+int validateArgs(Options * options){
 
 
-    if((options->min_shadows_amount != 2 || options->total_amount_of_shadows != 4) && (options->min_shadows_amount != 4 || options->total_amount_of_shadows != 8)) {
+    if(( options->total_amount_of_shadows != 4 || options->min_shadows_amount != 2) && (options->total_amount_of_shadows != 8 || options->min_shadows_amount != 4 )) {
         printf("%s\n","Invalid scheme");
         printf("%s\n","Please choose between (2,4) or (4,8)");
 
