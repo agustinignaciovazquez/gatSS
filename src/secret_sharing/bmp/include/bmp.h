@@ -2,8 +2,8 @@
 // Created by smanganaro
 //
 
-#ifndef BMP_BMP_H
-#define BMP_BMP_H
+#ifndef GATSS_BMP_H
+#define GATSS_BMP_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -76,5 +76,5 @@ int bmp_check_size(BMPImage ** bmp_list, int len);
 /* Checks if BMP Image header is valid */
 bool bmp_valid_header(BMPHeader * header);
 
-#endif // BMP_BMP_H
+#endif // GATSS_BMP_H
 

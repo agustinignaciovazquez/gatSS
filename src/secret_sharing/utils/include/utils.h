@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef GATSS_UTILS_H
+#define GATSS_UTILS_H
 
 #include "bmp.h"
 #include "matrix_operations.h"
@@ -17,4 +17,4 @@ void sm_from_bmp(matrix *sm, BMPImage * s, uint32_t base);
 
 void sm_merge_matrix(matrix * m, matrix * sm, uint32_t base);
 
-#endif // UTILS_H
+#endif // GATSS_UTILS_H

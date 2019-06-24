@@ -1,5 +1,5 @@
-#ifndef STEG_H
-#define STEG_H
+#ifndef GATSS_STEGANO_H
+#define GATSS_STEGANO_H
 
 #include <stdint.h>
 #include <unistd.h>
