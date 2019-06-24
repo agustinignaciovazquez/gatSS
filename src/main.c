@@ -143,7 +143,7 @@ int recovery_mode(Options options){
         return EXIT_FAILURE;
     }
 
-    print_bmps_info(bmp_list, file_list, to_open);
+    //print_bmps_info(bmp_list, file_list, to_open);
 
     FILE * rw_fd = fopen(options.water_mark_file_name, "rb");
 
@@ -159,10 +159,7 @@ int recovery_mode(Options options){
         return EXIT_FAILURE;
     }
 
-    recover(options.secret, bmp_list, rw_bmp,options.k, options.n);
-
     recover( options.secret_file_name, bmp_list, rw_bmp, options.min_shadows_amount, options.total_amount_of_shadows);
-
 
     return EXIT_SUCCESS;
 }
@@ -181,7 +178,6 @@ int main(int argc, char* argv[]) {
     if (validateArgs(&options)){
         return EXIT_FAILURE;
     }
-
 
     if(options.mode == DISTRIBUTE){
         return distribute_mode(options);

@@ -58,7 +58,7 @@ commandStat parseOptions(int argc, char **argv, Options * options){
             return ERROR_DUPMODE;
           }
           options->mode = DISTRIBUTE;
-          printf("%d\n",options->mode);
+          //printf("%d\n",options->mode);
           break;
 
         case 'r':
@@ -66,7 +66,7 @@ commandStat parseOptions(int argc, char **argv, Options * options){
             return ERROR_DUPMODE;            
           }
           options->mode = RETRIEVE;
-          printf("%d\n",options->mode);
+          //printf("%d\n",options->mode);
           break;
 
         case 's':
@@ -75,7 +75,7 @@ commandStat parseOptions(int argc, char **argv, Options * options){
             return ERROR_NO_SECRET_FILE;
           }
           strcpy(options->secret_file_name, optarg);
-          printf("%s\n",options->secret_file_name);
+          //printf("%s\n",options->secret_file_name);
           break;
 
         case 'm':
@@ -84,17 +84,17 @@ commandStat parseOptions(int argc, char **argv, Options * options){
             return ERROR_NO_WATERMARK_FILE;
           }
           strcpy(options->water_mark_file_name, optarg);
-          printf("%s\n",options->water_mark_file_name);
+          //printf("%s\n",options->water_mark_file_name);
           break;
 
         case 'k':
           options->min_shadows_amount = atoi(optarg);
-          printf("%d\n",options->min_shadows_amount);
+          //printf("%d\n",options->min_shadows_amount);
           break;
 
         case 'n':
           options->total_amount_of_shadows = atoi(optarg);
-          printf("%d\n",options->total_amount_of_shadows);
+          //printf("%d\n",options->total_amount_of_shadows);
           break;
 
         case 'i':
@@ -103,7 +103,7 @@ commandStat parseOptions(int argc, char **argv, Options * options){
             return ERROR_NO_DIRECTORY;
           }
           strcpy(options->directory, optarg);
-          printf("%s\n",options->directory);
+          //printf("%s\n",options->directory);
         break;
 
 
