@@ -155,7 +155,6 @@ void printHelp(){
     printf("if -d, name of the input .bmp file. if -r, name of the output .bmp file.\n");
     printf("%-30s", "\t-m image");
     printf("if -d, name of the watermark input .bmp file. if -r, name of the watermark output .bmp file \n");
-    printf("%-30s", "\t-pass password");
 }
 
 void paramInit(Options * options){
