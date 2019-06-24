@@ -19,9 +19,9 @@ int main(int argc, char* argv[]) {
 
     rand_set_seed(time(NULL));
     if(options.mode == DISTRIBUTE){
-        return distribute_mode(options);
+        return distribute_wrapper(options);
     } else if (options.mode == RETRIEVE){
-        return recovery_mode(options);
+        return recover_wrapper(options);
     }
 
     return EXIT_FAILURE;

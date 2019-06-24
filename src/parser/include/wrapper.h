@@ -7,6 +7,6 @@
 #include "parser.h"
 #include <stdlib.h>
 
-int distribute_mode(Options options);
-int recovery_mode(Options options);
+int distribute_wrapper(Options options);
+int recover_wrapper(Options options);
 #endif //GATSS_WRAPPER_H

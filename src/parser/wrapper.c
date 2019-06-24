@@ -6,24 +6,9 @@
 #include "distribute.h"
 #include "recover.h"
 #include "parser.h"
+static inline uint32_t check_shadows(BMPImage *sec, BMPImage **shadows, size_t l, uint32_t n, uint32_t k);
 
-static inline uint32_t check_shadows(BMPImage *sec, BMPImage **shadows, size_t l, uint32_t n, uint32_t k) {
-    BMPHeader secret_header = sec->header;
-    uint32_t real_byte_count = secret_header.width * secret_header.height;
-    size_t shadow_size = real_byte_count * (1.0 / k + 1.0 / n) * ((k == 4)? 8:4);
-
-    for (uint32_t i = 0; i < l; i++) {
-        BMPHeader header = shadows[i]->header;
-        size_t byte_count = header.image_size_bytes;
-        if (byte_count != shadow_size) {
-            return -1;
-        }
-    }
-
-    return 0;
-}
-
-int distribute_mode(Options options) {
+int distribute_wrapper(Options options) {
 
     DIR * dp = opendir(options.directory);
 
@@ -105,7 +90,7 @@ int distribute_mode(Options options) {
 
 }
 
-int recovery_mode(Options options){
+int recover_wrapper(Options options){
     DIR * dp = opendir(options.directory);
 
     if(dp == NULL) {
@@ -156,4 +141,20 @@ int recovery_mode(Options options){
     recover( options.secret_file_name, bmp_list, rw_bmp, options.min_shadows_amount, options.total_amount_of_shadows);
 
     return EXIT_SUCCESS;
+}
+
+static inline uint32_t check_shadows(BMPImage *sec, BMPImage **shadows, size_t l, uint32_t n, uint32_t k) {
+    BMPHeader secret_header = sec->header;
+    uint32_t real_byte_count = secret_header.width * secret_header.height;
+    size_t shadow_size = real_byte_count * (1.0 / k + 1.0 / n) * ((k == 4)? 8:4);
+
+    for (uint32_t i = 0; i < l; i++) {
+        BMPHeader header = shadows[i]->header;
+        size_t byte_count = header.image_size_bytes;
+        if (byte_count != shadow_size) {
+            return -1;
+        }
+    }
+
+    return 0;
 }
