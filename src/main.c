@@ -33,21 +33,21 @@ int distribute_mode(cmd_options options) {
 
     /* Open n images */
     to_open = options.n;
-    BMPImage ** bmp_list = open_files(file_list, to_open, options.dir);
+    BMPImage ** bmp_list = bmp_open_files(file_list, to_open, options.dir);
 
     if (bmp_list == NULL) {
-        printf("Error: Unable to open the required files (open_files).\n");
+        printf("Error: Unable to open the required files (bmp_open_files).\n");
         free(file_list);
         return EXIT_FAILURE;
     }
 
-    if (check_bmp_sizes(bmp_list, to_open)) {
+    if (bmp_check_size(bmp_list, to_open)) {
         printf("Error: all images must have the same width and height.\n");
         bmp_free_list(bmp_list, to_open);
         return EXIT_FAILURE;
     }
 
-    print_bmps_info(bmp_list, file_list, to_open);
+    bmp_print_info(bmp_list, file_list, to_open);
 
     FILE * watermark_fd = fopen(options.watermark, "rb");
 
@@ -56,7 +56,7 @@ int distribute_mode(cmd_options options) {
         return EXIT_FAILURE;
     }
 
-    BMPImage * watermark = read_bmp(watermark_fd);
+    BMPImage * watermark = bmp_read(watermark_fd);
 
     FILE * secret_fd = fopen(options.secret, "rb");
 
@@ -70,7 +70,7 @@ int distribute_mode(cmd_options options) {
         return EXIT_FAILURE;
     }
 
-    BMPImage * secret = read_bmp(secret_fd);
+    BMPImage * secret = bmp_read(secret_fd);
 
     if(secret == NULL) {
         printf("Error reading secret image\n");
@@ -85,7 +85,7 @@ int distribute_mode(cmd_options options) {
 
     if (check_shadow_sizes(secret, bmp_list, to_open, options.n, options.k)) {
         printf("Error: one or more of the shadow images does not have the required size.\n");
-        free_bmp(secret);
+        bmp_free(secret);
         free(bmp_list);
         return EXIT_FAILURE;
     }
@@ -124,21 +124,21 @@ int recovery_mode(cmd_options options){
     /* Open n images */
     to_open = options.k;
 
-    BMPImage ** bmp_list = open_files(file_list, to_open, options.dir);
+    BMPImage ** bmp_list = bmp_open_files(file_list, to_open, options.dir);
 
     if (bmp_list == NULL) {
-        printf("Error: Unable to open the required files (open_files).\n");
+        printf("Error: Unable to open the required files (bmp_open_files).\n");
         free(file_list);
         return EXIT_FAILURE;
     }
 
-    if (check_bmp_sizes(bmp_list, to_open)) {
+    if (bmp_check_size(bmp_list, to_open)) {
         printf("Error: all images must have the same width and height.\n");
         bmp_free_list(bmp_list, to_open);
         return EXIT_FAILURE;
     }
 
-    print_bmps_info(bmp_list, file_list, to_open);
+    bmp_print_info(bmp_list, file_list, to_open);
 
     FILE * rw_fd = fopen(options.watermark, "rb");
 
@@ -147,7 +147,7 @@ int recovery_mode(cmd_options options){
         return EXIT_FAILURE;
     }
 
-    BMPImage * rw_bmp = read_bmp(rw_fd);
+    BMPImage * rw_bmp = bmp_read(rw_fd);
 
     if(rw_bmp == NULL) {
         printf("Error reading watermark image\n");

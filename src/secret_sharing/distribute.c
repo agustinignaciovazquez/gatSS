@@ -14,9 +14,9 @@ static inline void stegano_into_image(matrix **shares, BMPImage **shadows, uint3
 
 void distribute(BMPImage *secret, BMPImage ** shadows, BMPImage * wm,uint32_t k, uint32_t n) {
     double width_factor = (1.0 / k + 1.0 / n);
-    uint32_t secret_rows = secret->header.height_px, secret_cols = (uint32_t) (secret->header.width_px * width_factor);
+    uint32_t secret_rows = secret->header.height, secret_cols = (uint32_t) (secret->header.width * width_factor);
 
-    matrix *rw = matrix_create_new(secret->header.height_px, secret->header.width_px);
+    matrix *rw = matrix_create_new(secret->header.height, secret->header.width);
     matrix *A = matrix_create_new(n, k);
     matrix *W = matrix_create_new(n, n);
     matrix *S = matrix_create_new(n, n);
@@ -111,7 +111,7 @@ static inline void stegano_into_image(matrix **shares, BMPImage **shadows, uint3
         filename[7] = ASCII_DIG(k+1);
         shadow->header.reserved1 = k;
         FILE *fd = fopen(filename, "wb");
-        write_bmp(shadow, fd);
+        bmp_write(shadow, fd);
     }
 }
 
@@ -182,8 +182,8 @@ static inline void rw_into_bmp(BMPImage *s, matrix *rw) {
     }
 
     FILE *rw_image_file = fopen("rw.bmp", "wb");
-    write_bmp(rw_image, rw_image_file);
+    bmp_write(rw_image, rw_image_file);
 
-    free_bmp(rw_image);
+    bmp_free(rw_image);
     fclose(rw_image_file);
 }

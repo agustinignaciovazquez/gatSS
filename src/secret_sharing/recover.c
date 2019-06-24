@@ -11,7 +11,7 @@ static inline void sm_from_matrix(matrix *s, matrix *secret, uint32_t base);
 void recover(char * filename, BMPImage **shadows, BMPImage *rw,uint32_t k, uint32_t n) {
     double width_factor = (1.0 / k + 1.0 / n);
     BMPImage *secret = build_image(shadows[0]), *watermark = build_image(shadows[0]);
-    uint32_t secret_rows = secret->header.height_px, secret_cols = (uint32_t) (secret->header.width_px * width_factor);
+    uint32_t secret_rows = secret->header.height, secret_cols = (uint32_t) (secret->header.width * width_factor);
 
     matrix *B = matrix_create_new(n, k);
     matrix *R = matrix_create_new(n, n);
@@ -101,11 +101,11 @@ void recover(char * filename, BMPImage **shadows, BMPImage *rw,uint32_t k, uint3
     }
 
     FILE *fd = fopen(filename, "wb");
-    write_bmp(secret, fd);
+    bmp_write(secret, fd);
 
     FILE *watermark_file = fopen("wm.bmp", "wb");
-    write_bmp(watermark, watermark_file);
-    free_bmp(watermark);
+    bmp_write(watermark, watermark_file);
+    bmp_free(watermark);
     fclose(watermark_file);
 
     //mem down

@@ -65,7 +65,7 @@ static inline size_t shadow_size_for(uint32_t image_size, uint32_t n, uint32_t k
 
 uint32_t check_shadow_sizes(BMPImage *secret, BMPImage **shadows, size_t len, uint32_t n, uint32_t k) {
     BMPHeader secret_header = secret->header;
-    uint32_t real_byte_count = secret_header.width_px * secret_header.height_px;
+    uint32_t real_byte_count = secret_header.width * secret_header.height;
     size_t shadow_size = shadow_size_for(real_byte_count, n, k);
 
     for (uint32_t i = 0; i < len; i++) {
