@@ -101,39 +101,15 @@ void distribute(BMPImage *secret, BMPImage ** shadows, BMPImage * wm,uint32_t k,
     free(shares);
 }
 
-static inline void stegano_into_image(matrix **shares, BMPImage **shadows, uint32_t n) {
-    char filename[20] = "shares_N.bmp";
-    for (uint32_t k = 0; k < n; ++k) {
-        BMPImage *shadow = shadows[k];
-        for (uint32_t p = 0; p < shares[0]->rows * shares[k]->cols; p++) {
-            distribute_lsb(shares[k]->values[p/shares[k]->cols][p%shares[k]->cols], shadow->data + p * n, n);
-        }
-        filename[7] = ASCII_DIG(k+1);
-        shadow->header.reserved1 = k;
-        FILE *fd = fopen(filename, "wb");
-        bmp_write(shadow, fd);
-    }
-}
-
-
-static inline void fill_G_into_matrix(matrix **G, matrix *R, uint32_t n, uint32_t k) {
-    uint32_t i1 = 0;
-    for (uint32_t i2 = 0; i2 < n; i2++) {
-        uint32_t s = 0;
-        for (uint32_t i = 0; i < R->rows; i++) {
-            for (uint32_t j = 0; j < R->cols; j += k) {
-                s = 0;
-                for (uint32_t l = 0; l < k; ++l) {
-                    uint32_t value = R->values[i][j + l];
-                    uint32_t pow = int_pow((i2 + 1), l);
-                    s += (value * pow);
-                }
-                G[i2]->values[i][i1] = s % MOD;
-                i1++;
+static inline void rand_A_verified_into_matrix(matrix * A) {
+    do {
+        for (uint32_t i = 0; i < A->rows; i++) {
+            for (uint32_t j = 0; j < A->cols; j++) {
+                A->values[i][j] = (uint32_t)(rand_next_char());
             }
-            i1 = 0;
         }
-    }
+    } while (rank(A) != A->cols || rank(matrix_multiply(matrix_transpose(A),A)) != A->cols);
+
 }
 
 static inline bool array_contains(uint8_t * arr, uint32_t n, uint8_t a) {
@@ -161,15 +137,38 @@ static inline void fill_rand_X_into(matrix ** X, uint32_t n, uint32_t k) {
     }
 }
 
-static inline void rand_A_verified_into_matrix(matrix * A) {
-    do {
-        for (uint32_t i = 0; i < A->rows; i++) {
-            for (uint32_t j = 0; j < A->cols; j++) {
-                A->values[i][j] = (uint32_t)(rand_next_char());
+static inline void fill_G_into_matrix(matrix **G, matrix *R, uint32_t n, uint32_t k) {
+    uint32_t i1 = 0;
+    for (uint32_t i2 = 0; i2 < n; i2++) {
+        uint32_t s = 0;
+        for (uint32_t i = 0; i < R->rows; i++) {
+            for (uint32_t j = 0; j < R->cols; j += k) {
+                s = 0;
+                for (uint32_t l = 0; l < k; ++l) {
+                    uint32_t value = R->values[i][j + l];
+                    uint32_t pow = int_pow((i2 + 1), l);
+                    s += (value * pow);
+                }
+                G[i2]->values[i][i1] = s % MOD;
+                i1++;
             }
+            i1 = 0;
         }
-    } while (rank(A) != A->cols || rank(matrix_multiply(matrix_transpose(A),A)) != A->cols);
+    }
+}
 
+static inline void stegano_into_image(matrix **shares, BMPImage **shadows, uint32_t n) {
+    char filename[20] = "shares_N.bmp";
+    for (uint32_t k = 0; k < n; ++k) {
+        BMPImage *shadow = shadows[k];
+        for (uint32_t p = 0; p < shares[0]->rows * shares[k]->cols; p++) {
+            distribute_lsb(shares[k]->values[p/shares[k]->cols][p%shares[k]->cols], shadow->data + p * n, n);
+        }
+        filename[7] = ASCII_DIG(k+1);
+        shadow->header.reserved1 = k;
+        FILE *fd = fopen(filename, "wb");
+        bmp_write(shadow, fd);
+    }
 }
 
 static inline void rw_into_bmp(BMPImage *s, matrix *rw) {
