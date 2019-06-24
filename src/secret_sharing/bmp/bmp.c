@@ -11,45 +11,45 @@
 
 BMPImage * bmp_read(FILE * fd) {
 
-    BMPImage * image = bmp_create_image();
+    BMPImage * img = bmp_create_image();
 
     size_t read = 0;
 
-    if(image == NULL) {
+    if(img == NULL) {
         return NULL;
     }
-    image->fd = fd;
+    img->fd = fd;
 
-    read = fread(&image->header, sizeof(image->header), 1, image->fd); //Leer header
+    read = fread(&img->header, sizeof(img->header), 1, img->fd); //Leer header
 
     if(read != 1) {
         fclose(fd);
         return NULL;
     }
 
-    if(!bmp_valid_header(&image->header)) {
+    if(!bmp_valid_header(&img->header)) {
         return NULL;
     }
 
-    if(fseek(image->fd, image->header.offset, 0) != 0) { //Ir al pixel array
+    if(fseek(img->fd, img->header.offset, 0) != 0) { //Ir al pixel array
         return NULL;
     }
-    image->data = malloc(image->header.image_size_bytes);
+    img->data = malloc(img->header.image_size_bytes);
 
-    read = fread(image->data, sizeof(uint8_t), image->header.image_size_bytes, image->fd); //Leer los pixeles
+    read = fread(img->data, sizeof(uint8_t), img->header.image_size_bytes, img->fd); //Leer los pixeles
 
-    if(read != image->header.image_size_bytes) {
+    if(read != img->header.image_size_bytes) {
         return NULL;
     }
 
-    size_t header2_size = image->header.offset - sizeof(image->header);
+    size_t header2_size = img->header.offset - sizeof(img->header);
 
-    if(fseek(image->fd, sizeof(image->header), 0) != 0) {
+    if(fseek(img->fd, sizeof(img->header), 0) != 0) {
         return NULL;
     }
-    image->header2 = malloc(header2_size);
+    img->header2 = malloc(header2_size);
 
-    read = fread(image->header2, sizeof(uint8_t), header2_size, image->fd);
+    read = fread(img->header2, sizeof(uint8_t), header2_size, img->fd);
 
     if(read != header2_size) {
         return NULL;
@@ -60,8 +60,8 @@ BMPImage * bmp_read(FILE * fd) {
 }
 
 BMPImage * bmp_create_image() {
-    BMPImage * image = (BMPImage *) malloc(sizeof(BMPImage));
-    return image;
+    BMPImage * img = (BMPImage *) malloc(sizeof(BMPImage));
+    return img;
 }
 
 bool bmp_valid_header(BMPHeader * header) {
@@ -72,44 +72,40 @@ bool bmp_valid_header(BMPHeader * header) {
 
 }
 
-void bmp_free(BMPImage * image) {
-    free(image);
+void bmp_free(BMPImage * img) {
+    free(img);
 }
 
-/* Returns the size of the extra header */
-int get_header2_size(BMPImage * image) {
-    return image->header.offset - sizeof(image->header);
-}
 
-/* Copies an image */
+int get_header2_size(BMPImage * img) {
+    return img->header.offset - sizeof(img->header);
+}
 
 BMPImage * copy_bmp(BMPImage * src) {
-    BMPImage * new_image = bmp_create_image();
-    memcpy(&new_image->header, &src->header, sizeof(src->header));
-    new_image->data = malloc(src->header.image_size_bytes);
-    memcpy(new_image->data, src->data, src->header.image_size_bytes);
+    BMPImage * img_new = bmp_create_image();
+    memcpy(&img_new->header, &src->header, sizeof(src->header));
+    img_new->data = malloc(src->header.image_size_bytes);
+    memcpy(img_new->data, src->data, src->header.image_size_bytes);
 
     int header2_size = get_header2_size(src);
-    new_image->header2 = malloc(header2_size);
-    memcpy(new_image->header2, src->header2, header2_size);
-    new_image->fd = src->fd;
-    return new_image;
+    img_new->header2 = malloc(header2_size);
+    memcpy(img_new->header2, src->header2, header2_size);
+    img_new->fd = src->fd;
+    return img_new;
 }
 
-/* Writes a BMP image into fd */
-
-int bmp_write(BMPImage * image, FILE * fd) {
-    int written = fwrite(&image->header, sizeof(image->header),1, fd);
+int bmp_write(BMPImage * img, FILE * fd) {
+    int written = fwrite(&img->header, sizeof(img->header),1, fd);
     if(written != 1) {
         return ERROR;
     }
-    int header2_size = get_header2_size(image);
-    written = fwrite(image->header2, sizeof(*image->header2),header2_size, fd);
+    int header2_size = get_header2_size(img);
+    written = fwrite(img->header2, sizeof(*img->header2),header2_size, fd);
     if(written != header2_size) {
         return ERROR;
     }
-    written = fwrite(image->data, sizeof(*image->data), image->header.image_size_bytes, fd);
-    if(written != image->header.image_size_bytes) {
+    written = fwrite(img->data, sizeof(*img->data), img->header.image_size_bytes, fd);
+    if(written != img->header.image_size_bytes) {
         return ERROR;
     }
     return OK;
@@ -119,7 +115,7 @@ uint32_t is_bmp_file(struct dirent *ep)
 {
     char *filename = ep->d_name;
     size_t len = strlen(filename);
-    if (len < 5 || ep->d_type != DT_REG)
+    if (ep->d_type != DT_REG || len < 5 )
     {
         return 0;
     }
@@ -134,27 +130,27 @@ uint32_t is_bmp_file(struct dirent *ep)
 }
 
 char ** bmps_in_dir(DIR *dp, int count, int *found) {
-    size_t bmp_count = 0;
+    size_t counter = 0;
     struct dirent *ep;
 
-    if (dp == NULL || found == NULL) {
+    if ( found == NULL || dp == NULL) {
         return NULL;
     }
 
     while ((ep = readdir(dp))) {
         if (is_bmp_file(ep)) {
-            bmp_count++;
+            counter++;
         }
     }
 
-    if (bmp_count == 0 || (count != 0 && bmp_count < count)) {
-        *found = bmp_count;
+    if ((count != 0 && counter < count) || counter == 0 ) {
+        *found = counter;
         return NULL;
     }
 
     rewinddir(dp);
 
-    char ** bmps = malloc(bmp_count * sizeof(char*));
+    char ** bmps = malloc(counter * sizeof(char*));
     if (bmps == NULL) {
         return NULL;
     }
@@ -166,18 +162,18 @@ char ** bmps_in_dir(DIR *dp, int count, int *found) {
         }
     }
 
-    qsort(bmps, bmp_count, sizeof(char*), compare_strings);
-    *found = bmp_count;
+    qsort(bmps, counter, sizeof(char*), compare_strings);
+    *found = counter;
 
     return bmps;
 }
 
-BMPImage ** bmp_open_files(char ** file_list, int to_open, char *dir) {
+BMPImage ** bmp_open_files(char ** list_of_files, int to_open, char *dir) {
     uint32_t i;
-    BMPImage ** bmp_list = malloc(to_open * sizeof(struct bmp_handle*));
+    BMPImage ** list_of_bmp = malloc(to_open * sizeof(struct bmp_handle*));
     char tmp_filename[FILE_MAX_LEN] = {0};
 
-    if (bmp_list == NULL) {
+    if (list_of_bmp == NULL) {
         return NULL;
     }
 
@@ -185,23 +181,23 @@ BMPImage ** bmp_open_files(char ** file_list, int to_open, char *dir) {
     {
         strcpy(tmp_filename, dir);
         strcat(tmp_filename, "/");
-        strcat(tmp_filename, file_list[i]);
+        strcat(tmp_filename, list_of_files[i]);
         FILE * fd = fopen(tmp_filename, "r");
-        bmp_list[i] = bmp_read(fd);
-        if (bmp_list[i] == NULL) {
-            bmp_free_list(bmp_list, i);
+        list_of_bmp[i] = bmp_read(fd);
+        if (list_of_bmp[i] == NULL) {
+            bmp_free_list(list_of_bmp, i);
             return NULL;
         }
     }
 
-    return bmp_list;
+    return list_of_bmp;
 }
 
-void bmp_free_list(BMPImage ** bmp_list, int len) {
+void bmp_free_list(BMPImage ** list_of_bmp, int len) {
     size_t i;
     for (i = 0; i < len; i++)
     {
-        bmp_free(bmp_list[i]);
+        bmp_free(list_of_bmp[i]);
     }
 }
 
@@ -210,20 +206,20 @@ int compare_strings(const void *a, const void *b) {
     return strcmp(*(char**)a, *(char**)b);
 }
 
-int bmp_check_size(BMPImage ** bmp_list, int len) {
+int bmp_check_size(BMPImage ** list_of_bmp, int len) {
     if (len < 2)
     {
         return -1;
     }
 
-    BMPHeader header = bmp_list[0]->header;
+    BMPHeader header = list_of_bmp[0]->header;
     uint32_t first_width = header.width;
     uint32_t first_height = header.height;
 
     uint32_t i;
     for (i = 1; i < len; i++)
     {
-        header = bmp_list[i]->header;
+        header = list_of_bmp[i]->header;
 
         if (header.width != first_width || header.height != first_height)
         {
@@ -235,23 +231,23 @@ int bmp_check_size(BMPImage ** bmp_list, int len) {
 }
 
 BMPImage * build_image(BMPImage * base) {
-    BMPImage * new_image = copy_bmp(base);
-    new_image->header2 = calloc(256 * 4, sizeof(uint8_t));
-    new_image->header.bits_per_pixel = 8;
-    new_image->header.size = base->header.width * base->header.height + 1024;
+    BMPImage * img_new = copy_bmp(base);
+    img_new->header2 = calloc(256 * 4, sizeof(uint8_t));
+    img_new->header.bits_per_pixel = 8;
+    img_new->header.size = base->header.width * base->header.height + 1024;
 
-    new_image->header.offset = 1078;
-    new_image->header.color_table_size = 256;
-    new_image->header.image_size_bytes = base->header.width * base->header.height;
+    img_new->header.offset = 1078;
+    img_new->header.color_table_size = 256;
+    img_new->header.image_size_bytes = base->header.width * base->header.height;
 
     uint32_t jj=3;
     for(uint32_t ii=0;ii<255;ii++){
-        new_image->header2[jj+1]=(uint8_t)ii+1;
-        new_image->header2[jj+2]=(uint8_t)ii+1;
-        new_image->header2[jj+3]=(uint8_t)ii+1;
+        img_new->header2[jj+1]=(uint8_t)ii+1;
+        img_new->header2[jj+2]=(uint8_t)ii+1;
+        img_new->header2[jj+3]=(uint8_t)ii+1;
         jj=jj+4;
     }
 
-    return new_image;
+    return img_new;
 }
 
