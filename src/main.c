@@ -6,9 +6,6 @@
 #include <stdlib.h>
 
 int main(int argc, char* argv[]) {
-
-    rand_set_seed(1);
-
     Options options;
     commandStat status = parseOptions(argc, argv, &options);
 
@@ -20,6 +17,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
+    rand_set_seed(time(NULL));
     if(options.mode == DISTRIBUTE){
         return distribute_mode(options);
     } else if (options.mode == RETRIEVE){

@@ -21,6 +21,17 @@ uint8_t rand_next_char(void) {
     return r;
 }
 
+uint32_t int_pow(uint32_t x, uint32_t y) {
+    if (y == 0) {
+        return 1;
+    }
+    uint32_t ret = x;
+    for (uint32_t i = 0; i < y - 1; i++) {
+        ret *= x;
+    }
+    return ret;
+}
+
 void sm_merge_matrix(matrix *m, matrix *sm, uint32_t base) {
     for (uint32_t k = 0; k < sm->rows * sm->cols; k++) {
         uint32_t j = (base + k) % m->cols;
@@ -37,15 +48,4 @@ void sm_from_bmp(matrix * sm, BMPImage * s, uint32_t base) {
         t = (uint32_t) s->data[base + k];
         sm->values[i][j] = (t > (MOD -1))?(MOD - 1):t;
     }
-}
-
-uint32_t int_pow(uint32_t x, uint32_t y) {
-    if (y == 0) {
-        return 1;
-    }
-    uint32_t ret = x;
-    for (uint32_t i = 0; i < y - 1; i++) {
-        ret *= x;
-    }
-    return ret;
 }
